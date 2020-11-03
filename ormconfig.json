@@ -1,0 +1,17 @@
+{
+  "type": "mysql",
+  "host": "127.0.0.1",
+  "port": 3307,
+  "username": "dsmtw_user",
+  "password": "dsmtw_pass",
+  "database": "dsmtw",
+  "entities": ["dist/Models/**/*{.ts,.js}"],
+  "migrations": ["dist/Migrations/**/*{.ts,.js}"],
+  "seeds": ["dist/Seeds/**/*.js"],
+  "factories": ["dist/Factories/**/*.js"],
+  "synchronize": false,
+  "cli" : {
+    "entitiesDir" : "src/Models",
+    "migrationsDir": "src/Migrations"
+  }
+}

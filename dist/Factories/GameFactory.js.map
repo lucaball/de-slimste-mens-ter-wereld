@@ -1,0 +1,1 @@
+{"version":3,"file":"GameFactory.js","sourceRoot":"","sources":["../../src/Factories/GameFactory.ts"],"names":[],"mappings":";;AACA,qDAAsC;AACtC,yCAAoC;AAEpC,wBAAM,CAAC,WAAI,EAAE,CAAC,KAAmB,EAAE,EAAE;IAEjC,IAAI,IAAI,GAAU,IAAI,WAAI,EAAE,CAAC;IAC7B,IAAI,CAAC,IAAI,GAAG,KAAK,CAAC,KAAK,CAAC,KAAK,CAAC,CAAC,CAAC,CAAC;IAEjC,OAAO,IAAI,CAAC;AAChB,CAAC,CAAC,CAAA"}

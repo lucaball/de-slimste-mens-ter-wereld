@@ -1,7 +1,8 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, ManyToOne, OneToMany} from "typeorm";
 import {BaseResource} from "./BaseResource";
-import {Exclude, Expose} from 'class-transformer';
-import {randomString, scramble} from "../Functions/scramble";
+import {Exclude} from 'class-transformer';
+import {randomString} from "../Functions/scramble";
+import {GameRound} from "./GameRound";
 
 @Entity()
 export class Game extends BaseResource {
@@ -9,15 +10,12 @@ export class Game extends BaseResource {
     @Column({nullable: true})
     name: string;
 
-    @Column({unique: true, nullable : false})
+    @Column({unique: true, nullable: false})
     @Exclude()
-    joinCode : string;
+    joinCode: string;
 
-    @Expose({ groups: ['answered'] })
-    data : string = "FREAKING HELL";
-
-    @Expose({ groups: ['unanswered'] })
-    scrambled() : string { return scramble(this.data) };
+    @OneToMany(() => Game, game => game.rounds)
+    rounds: GameRound[]
 
     constructor(partial: Partial<Game> | null = null) {
         super();

@@ -6,6 +6,8 @@
    "private": true,
    "license": "UNLICENSED",
    "scripts": {
+      "sync": "typeorm schema:sync",
+      "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
       "prebuild": "rimraf dist",
       "build": "nest build",
       "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -21,14 +23,18 @@
       "test:e2e": "jest --config ./test/jest-e2e.json"
    },
    "dependencies": {
+      "@inertiajs/inertia": "^0.6.1",
+      "@inertiajs/inertia-vue": "^0.4.1",
       "@nestjs/common": "^7.0.0",
       "@nestjs/config": "^0.5.0",
       "@nestjs/core": "^7.0.0",
       "@nestjs/platform-express": "^7.0.0",
+      "@nestjs/serve-static": "^2.1.3",
       "@nestjs/typeorm": "^7.1.4",
       "@types/faker": "^5.1.4",
       "class-transformer": "^0.3.1",
       "hbs": "^4.1.1",
+      "inertia-node": "^1.1.2",
       "mysql": "^2.14.1",
       "reflect-metadata": "^0.1.13",
       "rimraf": "^3.0.2",

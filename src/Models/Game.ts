@@ -1,11 +1,11 @@
-import {Column, Entity, ManyToOne, OneToMany} from "typeorm";
+import {Column, Entity, ManyToOne, ObjectLiteral, OneToMany} from "typeorm";
 import {BaseResource} from "./BaseResource";
 import {Exclude} from 'class-transformer';
 import {randomString} from "../Functions/scramble";
 import {GameRound} from "./GameRound";
 
 @Entity()
-export class Game extends BaseResource {
+export class Game extends BaseResource implements ObjectLiteral{
 
     @Column({nullable: true})
     name: string;
@@ -14,7 +14,7 @@ export class Game extends BaseResource {
     @Exclude()
     joinCode: string;
 
-    @OneToMany(() => Game, game => game.rounds)
+    @OneToMany(() => GameRound, gameRound => gameRound.game)
     rounds: GameRound[]
 
     constructor(partial: Partial<Game> | null = null) {

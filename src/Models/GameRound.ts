@@ -1,15 +1,26 @@
 import {BaseResource} from "./BaseResource";
-import {Entity, JoinColumn, ManyToOne, OneToMany} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany} from "typeorm";
 import {Game} from "./Game";
 import {Question} from "./Question";
 
 @Entity()
 export class GameRound extends BaseResource{
 
-    @ManyToOne(() => Game, game => game.rounds)
+    constructor(name, game, questions) {
+        super();
+
+        this.name = name;
+        this.game = game;
+        this.questions =questions;
+    }
+
+    @Column()
+    name: string;
+
+    @ManyToOne(type => Game, game => game.rounds)
     @JoinColumn({name: 'game_id', referencedColumnName: 'id'})
     game: Game
 
-    @OneToMany(() => Question, question => question.gameRound)
+    @OneToMany(type => Question, question => question.gameRound)
     questions: Question[]
 }

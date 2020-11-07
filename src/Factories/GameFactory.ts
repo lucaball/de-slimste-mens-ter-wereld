@@ -11,7 +11,7 @@ define(Game, (faker: typeof Faker) => {
     return game;
 })
 
-define(GameRound, (faker: typeof Faker, context: { name: string, game: Game }) => {
+define(GameRound, (faker: typeof Faker, context: { name: string, game: Game, position : number }) => {
 
-    return new GameRound(context.name, context.game, []);
+    return new GameRound(context.name, context.game, context.position);
 })

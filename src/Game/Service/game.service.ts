@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Game} from "../../Models/Game";
 import {Repository} from "typeorm";
@@ -9,8 +9,12 @@ export class GameService {
     constructor(@InjectRepository(Game) private gameRepository : Repository<Game>) {
     }
 
+    async getOneWithRounds(gameId: string) : Promise<Game | null> {
 
-    async getOneForId(gameId: string) : Promise<Game | null> {
-        return await this.gameRepository.findOneOrFail(gameId);
+        return await this.gameRepository.createQueryBuilder("game")
+            .leftJoinAndSelect("game.rounds", "rounds",)
+            .where("game.id = :gameid", {gameid: gameId})
+            .orderBy('rounds.position', 'ASC')
+            .getOne();
     }
 }

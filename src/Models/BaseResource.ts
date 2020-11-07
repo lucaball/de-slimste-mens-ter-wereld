@@ -1,9 +1,12 @@
-import {Column, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Generated, PrimaryGeneratedColumn} from "typeorm";
 
 export abstract class BaseResource {
 
     @PrimaryGeneratedColumn("uuid")
     id: string;
+
+    @Generated("increment")
+    number: number;
 
     @Column({type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
     createdAt: Date;

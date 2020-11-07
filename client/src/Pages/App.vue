@@ -35,7 +35,7 @@
           De slimste mens ter wereld</h1>
         <p class="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle">Stel hier
           je quiz samen en speel 'm meteen online!</p>
-        <button @click="openModal($event)"
+        <button @click="openModal($event, $el)"
                 class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full"
         >Let's go!
         </button>
@@ -52,7 +52,7 @@
           <input ref="gameName" v-model="gameName" autofocus="autofocus" type="text" id="game-name"
                  class="px-4 py-2 border-2 border-black rounded w-full">
           <button type="submit"
-                  class="mt-3 w-full bg-black font-bold text-white text-center rounded py-2 text-capitalize">
+                  class="mt-3 w-full bg-black font-bold text-white text-center rounded py-2 text-uppercase">
             GO!
           </button>
         </form>
@@ -77,7 +77,8 @@ export default {
     clearInputs() {
       this.gameName = "";
     },
-    openModal(e) {
+    openModal(e, el) {
+      el.blur();
       this.$refs.modalName.openModal()
       // this.$refs.gameName.focus();
     },
@@ -92,7 +93,7 @@ export default {
             this.gameName = "";
             this.$refs.modalName.closeModal()
 
-            this.$inertia.visit(response.data.compositeuri);
+            this.$inertia.visit(response.data.composeuri);
           });
     }
   },

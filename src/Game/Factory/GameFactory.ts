@@ -19,12 +19,12 @@ export class GameFactory {
     constructor(
         @InjectRepository(Game)
         private gameRepository: Repository<Game>,
-
         @InjectRepository(GameRound)
-        private gameRoundRepository : Repository<GameRound>
-    ) {}
+        private gameRoundRepository: Repository<GameRound>
+    ) {
+    }
 
-    async createWithRounds(data: {name : string}) : Promise<Game> {
+    async createWithRounds(data: { name: string }): Promise<Game> {
 
         const game = new Game();
         game.name = data.name;
@@ -35,11 +35,12 @@ export class GameFactory {
         return game;
     }
 
-    private createRounds(game: Game)
-    {
+    private createRounds(game: Game) {
+        let position = 0;
         GameFactory.gameRounds.forEach((roundName) => {
-           const gameRound = new GameRound(roundName, game, []);
-           this.gameRoundRepository.insert(gameRound)
-       })
+            const gameRound = new GameRound(roundName, game, position);
+            this.gameRoundRepository.insert(gameRound)
+            position++;
+        })
     }
 }

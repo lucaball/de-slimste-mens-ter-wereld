@@ -15,6 +15,9 @@ export class Question extends BaseResource {
     @Column()
     value: string
 
+    @Column({type : "integer"})
+    position : number
+
     @ManyToOne(() => GameRound, gameRound => gameRound.questions)
     @JoinColumn({name: 'round_id', referencedColumnName: 'id' })
     gameRound: GameRound

@@ -8,6 +8,7 @@ import * as inertia from 'inertia-node/src';
 import {GameController} from "./Game/Controller/game.controller";
 import {GameFactory} from "./Game/Factory/GameFactory";
 import {GameService} from "./Game/Service/game.service";
+import {GameRoundService} from "./GameRound/Service/game-round.service";
 
 @Module({
     imports: [
@@ -15,7 +16,7 @@ import {GameService} from "./Game/Service/game.service";
         TypeOrmModule.forFeature([Game, GameRound]),
     ],
     controllers: [AppController, GameController],
-    providers: [AppService, GameFactory, GameService],
+    providers: [AppService, GameFactory, GameService, GameRoundService],
 })
 
 export class AppModule implements NestModule {

@@ -3,12 +3,21 @@ import {GameFactory} from "../Factory/GameFactory";
 import {Request} from "@nestjs/common";
 import {Game} from "../../Models/Game";
 import {GameService} from "../Service/game.service";
+import {GameRound} from "../../Models/GameRound";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
+import {GameRoundService} from "../../GameRound/Service/game-round.service";
 
 @Controller()
 export class GameController {
 
-    constructor(private gameFactory: GameFactory, private gameService : GameService) {
-    }
+    constructor(
+        @InjectRepository(GameRound)
+        private gameRoundRepository : Repository<GameRound>,
+        private gameFactory: GameFactory,
+        private gameService : GameService,
+        private gameRoundService: GameRoundService
+    ) {}
 
     @Post("/create-game")
     async createGame(@Body() createGameBody: any) {
@@ -16,11 +25,18 @@ export class GameController {
         const game: Game = await this.gameFactory.createWithRounds(createGameBody);
 
         return {
-            "compositeuri": "/game/" + game.id + '/composite'
+            "composeuri": await this.getFirstRoundUri(game)
         }
     }
 
-    @Get('/game/:id/composite')
+    private async getFirstRoundUri(game: Game) {
+        const gameWithRounds: Game = await this.gameService.getOneWithRounds(game.id);
+        const firstGameRound : GameRound = gameWithRounds.rounds[0];
+
+        return "/game/" + game.id + '/rounds/' + firstGameRound.id
+    }
+
+    @Get('/game/:id/rounds/:roundId')
     async test(
         @Request() request: Request,
         @Param() params
@@ -29,9 +45,10 @@ export class GameController {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         request.Inertia.render({
-            component: "GameComposite",
+            component: "RoundEdit",
             props: {
-                game : await this.gameService.getOneForId(params.id)
+                game : await this.gameService.getOneWithRounds(params.id),
+                round : await this.gameRoundService.getOneWithQuestions(params.roundId)
             }
         });
     }

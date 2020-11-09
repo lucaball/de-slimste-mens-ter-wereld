@@ -9,14 +9,17 @@ import {GameController} from "./Game/Controller/game.controller";
 import {GameFactory} from "./Game/Factory/GameFactory";
 import {GameService} from "./Game/Service/game.service";
 import {GameRoundService} from "./GameRound/Service/game-round.service";
+import {QuestionController} from "./Question/Controller/QuestionController";
+import {QuestionFactory} from "./Question/Factory/QuestionFactory";
+import {Question} from "./Models/Question";
 
 @Module({
     imports: [
         TypeOrmModule.forRoot({}),
-        TypeOrmModule.forFeature([Game, GameRound]),
+        TypeOrmModule.forFeature([Game, GameRound, Question]),
     ],
-    controllers: [AppController, GameController],
-    providers: [AppService, GameFactory, GameService, GameRoundService],
+    controllers: [AppController, GameController, QuestionController],
+    providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory],
 })
 
 export class AppModule implements NestModule {

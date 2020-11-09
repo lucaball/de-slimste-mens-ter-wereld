@@ -17,7 +17,7 @@
             </inertia-link>
           </span>
         </div>
-        <div class="flex flex-row w-10/12 p-10">
+        <div class="flex flex-row w-10/12">
           <slot></slot>
         </div>
       </div>

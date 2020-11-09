@@ -1,25 +1,19 @@
 <template>
   <div class="p-4 rounded bg-gray-200 mb-4">
-    <component v-bind:is="currentTabComponent" class="tab"></component>
-    <label for="texttype" class="p-1 rounded bg-blue-200 mr-2" :class="{ 'bg-blue-700' : (question.type === 'text') }">
-      T
-      <input type="radio" id="texttype" value="text" class="hidden" v-model="question.type">
-    </label>
-    <label for="imagetype" class="p-1 rounded bg-blue-200 mr-2" :class="{ 'bg-blue-700' : (question.type === 'image') }">
-      <ImageIcon size="22"/>
-      <input type="radio" id="imagetype" value="image" class="hidden" v-model="question.type">
-    </label>
-    <label for="videotype" class="p-1 rounded bg-blue-200 mr-2" :class="{ 'bg-blue-700' : (question.type === 'video') }">
-      V
-      <input type="radio" id="videotype" value="video" class="hidden" v-model="question.type">
-    </label>
-    <input
-        @change="saveQuestion"
-        ref="gameName"
-        v-model="question.value"
-        type="text"
-        id="question-name"
-        class="px-4 py-2 rounded w-full">
+    <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'text') }" @click="question.type = 'text'">
+      <TextIcon size="20"></TextIcon>
+    </button>
+    <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'image') }" @click="question.type = 'image'">
+      <ImageIcon size="20"></ImageIcon>
+    </button>
+    <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'video') }" @click="question.type = 'video'">
+      <VideoIcon size="20"></VideoIcon>
+    </button>
+
+    <TextType :question="question" @input="question.value = $event"></TextType>
+    <ImageType :question="question" @input="question.value = $event"></ImageType>
+    <VideoType :question="question" @input="question.value = $event"></VideoType>
+
     <button class="mt-2 border-2 rounded p-2 border-black" @click="$emit('editanswers', question)">
       Antwoorden bewerken
     </button>
@@ -30,19 +24,18 @@
 import ImageIcon from "../Icons/ImageIcon";
 import axios from "axios";
 import TextType from "./InputTypes/TextType";
+import ImageType from "./InputTypes/ImageType";
+import VideoType from "./InputTypes/VideoType";
+import VideoIcon from "../Icons/VideoIcon";
+import TextIcon from "../Icons/TextIcon";
 
 export default {
   name: "Question",
-  components: {TextType, ImageIcon},
-  data(){
-    return {
-      currentTabComponent : TextType
-    }
-  },
-  methods : {
-    saveQuestion(){
+  components: {VideoIcon, VideoType, ImageType, TextType, ImageIcon, TextIcon},
+  methods: {
+    saveQuestion() {
       axios.put('/question/' + this.question.id, this.question)
-    }
+    },
   },
   props: {
     question: {}

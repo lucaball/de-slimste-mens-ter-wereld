@@ -3,15 +3,23 @@ import {BaseResource} from "./BaseResource";
 import {Expose} from "class-transformer";
 import {scramble} from "../Functions/scramble";
 import {Question} from "./Question";
+import {BeforeInsert, BeforeUpdate} from "typeorm/index";
 
 @Entity()
 export class Answer extends BaseResource{
 
     @Expose({ groups: ['answered'] })
-    data : string;
+    @Column({nullable: true})
+    value : string;
 
     @Expose({ groups: ['unanswered'] })
-    scrambled() : string { return scramble(this.data) };
+    @Column({nullable: true})
+    scrambled : string;
+
+    @BeforeUpdate()
+    scramble(){
+        this.scrambled = scramble(this.value);
+    }
 
     @ManyToOne(() => Question, question => question.answers)
     @JoinColumn({name: 'question_id', referencedColumnName: 'id' })

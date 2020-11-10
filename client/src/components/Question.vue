@@ -10,11 +10,11 @@
       <VideoIcon :size=20></VideoIcon>
     </button>
 
-    <TextType :question="question" @input="question.value = $event"></TextType>
-    <ImageType :question="question" @input="question.value = $event"></ImageType>
-    <VideoType :question="question" @input="question.value = $event"></VideoType>
+    <TextType :question="question" @input="question.value = $event; saveQuestion()"></TextType>
+    <ImageType :question="question" @input="question.value = $event; saveQuestion()"></ImageType>
+    <VideoType :question="question" @input="question.value = $event; saveQuestion()"></VideoType>
 
-    <button class="mt-2 border-2 rounded p-2 border-black" @click="$emit('editanswers', question)">
+    <button class="mt-2 hover:underline" @click="$emit('editanswers', question)">
       Antwoorden bewerken
     </button>
   </div>
@@ -36,10 +36,6 @@ export default {
     if(this.question.value !== ""){
       return;
     }
-
-    this.$nextTick(() => {
-
-    })
   },
   methods: {
     saveQuestion() {

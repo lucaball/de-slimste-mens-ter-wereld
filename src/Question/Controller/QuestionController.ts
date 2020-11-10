@@ -1,4 +1,4 @@
-import {Body, Controller, Inject, Param, Post, Put} from "@nestjs/common";
+import {Body, Controller, Get, Inject, Param, Post, Put} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {GameRound} from "../../Models/GameRound";
 import {Repository} from "typeorm";
@@ -25,6 +25,20 @@ export class QuestionController {
         const gameRound = await this.gameRoundRepository.findOne({id: createQuestionBody.round})
         return {
             question: await this.questionFactory.createForRound(gameRound)
+        }
+    }
+
+    @Get('/question/:id/answers')
+    async getAnswers(
+        @Param() params : any
+    ){
+        const question = await this.questionRepository.createQueryBuilder('question')
+            .leftJoinAndSelect('question.answers', 'answers')
+            .where("question.id = :questionId", { "questionId" : params.id})
+            .getOne();
+
+        return {
+            "question" : question
         }
     }
 

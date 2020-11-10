@@ -18,7 +18,7 @@ export class GameRoundService {
         return await this.gameRoundRepository.createQueryBuilder("gameRound")
             .leftJoinAndSelect("gameRound.questions", "questions",)
             .where("gameRound.id = :gameid", {gameid: gameRoundId})
-            // .orderBy('rounds.position', 'ASC')
+            .orderBy('questions.position', 'ASC')
             .getOne();
     }
 }

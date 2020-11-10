@@ -11,7 +11,7 @@
       </button>
     </div>
     <div class="w-6/12">
-      <QuestionAnswerLayout class="p-10" :answers="answers">
+      <QuestionAnswerLayout v-if="questionHasBeenChosen" class="p-10" :question="questionToEditAnswers" :answers="answers">
       </QuestionAnswerLayout>
     </div>
   </GameComposite>
@@ -29,6 +29,7 @@ export default {
   components: {QuestionAnswerLayout, Question, GameComposite},
   data() {
     return {
+      questionHasBeenChosen : false,
       questionToEditAnswers: {},
       answers: []
     }
@@ -40,20 +41,19 @@ export default {
         round: this.round.id
       }).then((response) => {
         this.round.questions.push(response.data.question);
-
-        console.log(this.$refs);
       })
     },
 
     showAnswersEdit(question) {
 
+      this.questionHasBeenChosen = true;
       this.questionToEditAnswers = question
       this.answers = [];
 
       axios
           .get('/question/' + question.id + '/answers')
           .then((response) => {
-            console.log(response);
+            this.answers = response.data.question.answers
           });
     }
   },

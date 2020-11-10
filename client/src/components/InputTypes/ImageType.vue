@@ -1,14 +1,13 @@
 <template>
   <div v-if="question.type === 'image' ">
-    <input type="text" :value="question.value">
-    Image
+        <input class="rounded w-full p-2" type="file" :value="question.value">
   </div>
 </template>
 
 <script>
 export default {
   name: "ImageType",
-  props : {
+  props: {
     question: {}
   }
 }

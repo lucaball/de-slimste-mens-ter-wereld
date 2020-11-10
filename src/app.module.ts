@@ -12,13 +12,15 @@ import {GameRoundService} from "./GameRound/Service/game-round.service";
 import {QuestionController} from "./Question/Controller/QuestionController";
 import {QuestionFactory} from "./Question/Factory/QuestionFactory";
 import {Question} from "./Models/Question";
+import { AnswerController } from './Answer/Controller/answer.controller';
+import {Answer} from "./Models/Answer";
 
 @Module({
     imports: [
         TypeOrmModule.forRoot({}),
-        TypeOrmModule.forFeature([Game, GameRound, Question]),
+        TypeOrmModule.forFeature([Game, GameRound, Question, Answer]),
     ],
-    controllers: [AppController, GameController, QuestionController],
+    controllers: [AppController, GameController, QuestionController, AnswerController],
     providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory],
 })
 
@@ -50,6 +52,5 @@ export class AppModule implements NestModule {
 
     configure(consumer: MiddlewareConsumer): any {
         consumer.apply(inertia(this.html, this.ASSET_VERSION)).forRoutes('*')
-        // consumer.apply(InertiaMiddleware).forRoutes('*')
     }
 }

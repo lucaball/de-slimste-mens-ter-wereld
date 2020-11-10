@@ -3,8 +3,7 @@
     <div class="w-5/12 p-10 border-r-2 border-black">
       <h2 class="text-3xl">{{ round.name }}</h2>
       <Question @editanswers="showAnswersEdit" class="py-4" :question="question"
-                v-for="question in round.questions" :key="question.id">
-
+                v-for="question in round.questions" :key="question.id" :ref="question.id">
       </Question>
       <button @click="addQuestion"
               class="mt-3 w-full border-dashed border-gray-500 text-gray-500 border-2 font-bold text-center rounded py-2 uppercase">
@@ -39,9 +38,13 @@ export default {
     addQuestion() {
       axios.post('/question/new', {
         round: this.round.id
-      }).then((response) => this.round.questions.push(response.data.question))
+      }).then((response) => {
+        this.round.questions.push(response.data.question);
+
+        console.log(this.$refs);
+      })
     },
-    
+
     showAnswersEdit(question) {
 
       this.questionToEditAnswers = question

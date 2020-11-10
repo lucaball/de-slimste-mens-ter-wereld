@@ -79,8 +79,12 @@ export default {
     },
     openModal(e, el) {
       el.blur();
+
       this.$refs.modalName.openModal()
-      // this.$refs.gameName.focus();
+
+      this.$nextTick(() => {
+        this.$refs.gameName.focus();
+      })
     },
     createGame(e) {
       e.preventDefault();

@@ -14,9 +14,9 @@
     <ImageType :question="question" @input="question.value = $event; saveQuestion()"></ImageType>
     <VideoType :question="question" @input="question.value = $event; saveQuestion()"></VideoType>
 
-    <button class="mt-2 hover:underline" @click="$emit('editanswers', question)">
+    <a aria-label="button" class="mt-2 hover:underline hover:cursor-pointer" @click="$emit('editanswers', question)">
       Antwoorden bewerken
-    </button>
+    </a>
   </div>
 </template>
 

@@ -1,11 +1,11 @@
-import {Body, Controller, Get, Inject, Param, Post, Put} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Inject, Param, Post, Put} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {GameRound} from "../../Models/GameRound";
 import {Repository} from "typeorm";
 import {QuestionFactory} from "../Factory/QuestionFactory";
 import {Question} from "../../Models/Question";
 
-@Controller()
+@Controller('question')
 export class QuestionController {
 
     constructor(
@@ -17,7 +17,7 @@ export class QuestionController {
     ) {
     }
 
-    @Post("/question/new")
+    @Post("/new")
     async createNewForRound(
         @Body() createQuestionBody: any
     ) {
@@ -28,7 +28,7 @@ export class QuestionController {
         }
     }
 
-    @Get('/question/:id/answers')
+    @Get('/:id/answers')
     async getAnswers(
         @Param() params : any
     ){
@@ -42,7 +42,7 @@ export class QuestionController {
         }
     }
 
-    @Put('/question/:id')
+    @Put('/:id')
     async updateQuestion(
         @Body() updateQuestionBody : any,
         @Param() queryParams : any
@@ -58,4 +58,6 @@ export class QuestionController {
         };
     }
 
+    @Delete('/:id')
+    deleteQuestion()                
 }

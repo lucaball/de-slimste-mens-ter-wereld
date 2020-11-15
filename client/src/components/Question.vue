@@ -1,20 +1,28 @@
 <template>
   <div class="p-4 rounded bg-gray-200 mb-4">
-    <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'text') }" @click="question.type = 'text'">
-      <TextIcon :size=20></TextIcon>
-    </button>
-    <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'image') }" @click="question.type = 'image'">
-      <ImageIcon :size=20></ImageIcon>
-    </button>
-    <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'video') }" @click="question.type = 'video'">
-      <VideoIcon :size=20></VideoIcon>
-    </button>
+    <div class="flex justify-between">
+      <div>
+        <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'text') }" @click="question.type = 'text'">
+          <TextIcon :size=20></TextIcon>
+        </button>
+        <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'image') }" @click="question.type = 'image'">
+          <ImageIcon :size=20></ImageIcon>
+        </button>
 
-    <TextType :question="question" @input="question.value = $event; saveQuestion()"></TextType>
-    <ImageType :question="question" @input="question.value = $event; saveQuestion()"></ImageType>
-    <VideoType :question="question" @input="question.value = $event; saveQuestion()"></VideoType>
+        <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'video') }" @click="question.type = 'video'">
+          <VideoIcon :size=20></VideoIcon>
+        </button>
+      </div>
+      <div>
+        <DeleteButton @confirm="deleteQuestion()"></DeleteButton>
+      </div>
+    </div>
 
-    <a aria-label="button" class="mt-2 hover:underline hover:cursor-pointer" @click="$emit('editanswers', question)">
+    <TextType :question="question" @input="saveQuestion()"></TextType>
+    <ImageType :question="question" @input="saveQuestion()"></ImageType>
+    <VideoType :question="question" @input="saveQuestion()"></VideoType>
+
+    <a aria-label="button" class="mt-2 hover:underline cursor-pointer" @click="$emit('editanswers', question)">
       Antwoorden bewerken
     </a>
   </div>
@@ -28,16 +36,20 @@ import ImageType from "./InputTypes/ImageType";
 import VideoType from "./InputTypes/VideoType";
 import VideoIcon from "../Icons/VideoIcon";
 import TextIcon from "../Icons/TextIcon";
+import DeleteButton from "./Buttons/DeleteButton";
 
 export default {
   name: "Question",
-  components: {VideoIcon, VideoType, ImageType, TextType, ImageIcon, TextIcon},
+  components: {DeleteButton, VideoIcon, VideoType, ImageType, TextType, ImageIcon, TextIcon},
   created(){
     if(this.question.value !== ""){
       return;
     }
   },
   methods: {
+    deleteQuestion(){
+
+    },
     saveQuestion() {
       axios.put('/question/' + this.question.id, this.question)
     },

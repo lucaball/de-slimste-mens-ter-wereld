@@ -1,6 +1,6 @@
 var Encore = require('@symfony/webpack-encore');
 const CopyPlugin = require('copy-webpack-plugin');
-
+const path = require('path');
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
@@ -81,6 +81,9 @@ Encore
             // directory where the postcss.config.js file is stored
             path: './postcss.config.js'
         };
+    })
+    .addAliases({
+        '@': path.resolve('./client/src'),
     })
 ;
 

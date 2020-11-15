@@ -48,7 +48,11 @@ export default {
   },
   methods: {
     deleteQuestion(){
-
+      axios.delete("/question/" + this.question.id).then((response) => {
+        if (response.data){
+          this.$emit('removeFromList', this.question)
+        }
+      });
     },
     saveQuestion() {
       axios.put('/question/' + this.question.id, this.question)

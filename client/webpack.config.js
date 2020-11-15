@@ -28,8 +28,8 @@ Encore
     .addEntry('main', './src/main.js')
     .addStyleEntry('style', './css/tailwind.css')
     .enableSassLoader()
-    .enableVueLoader()
-    //.addEntry('page1', './assets/page1.js')
+    .enableVueLoader(() => {}, { runtimeCompilerBuild: false })
+        //.addEntry('page1', './assets/page1.js')
     //.addEntry('page2', './assets/page2.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
@@ -83,7 +83,7 @@ Encore
         };
     })
     .addAliases({
-        '@': path.resolve('./client/src'),
+        // '@': path.resolve('./client/src'),
     })
 ;
 

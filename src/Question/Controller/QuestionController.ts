@@ -48,8 +48,6 @@ export class QuestionController {
         @Param() queryParams : any
     ){
         const question : Question = await this.questionRepository.findOne({ id: queryParams.id})
-
-        console.log(updateQuestionBody);
         question.value = updateQuestionBody.value;
         question.type = updateQuestionBody.type;
 
@@ -59,5 +57,17 @@ export class QuestionController {
     }
 
     @Delete('/:id')
-    deleteQuestion()                
+    async deleteQuestion(
+        @Param() queryParams : any
+    ){
+        const question : Question = await this.questionRepository.findOne({ id: queryParams.id})
+
+        if(null === question){
+            return false;
+        }
+
+        this.questionRepository.remove([question]);
+
+        return true;
+    }
 }

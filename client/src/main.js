@@ -7,10 +7,11 @@ Vue.use(plugin)
 const el = document.getElementById('app')
 
 new Vue({
+  el: '#app',
   render: h => h(App, {
     props: {
       initialPage: JSON.parse(el.dataset.page),
       resolveComponent: name => require(`./Pages/${name}`).default,
     },
   }),
-}).$mount(el)
+});

@@ -4,18 +4,18 @@ import {Game} from "./Game";
 import {Question} from "./Question";
 
 @Entity()
-export class GameRound extends BaseResource{
+export class GameRound extends BaseResource {
 
     constructor(name, game, position) {
         super();
 
         this.name = name;
         this.game = game;
-        this.position =position;
+        this.position = position;
     }
 
     @Column({type: "int"})
-    position : number;
+    position: number;
 
     @Column()
     name: string;

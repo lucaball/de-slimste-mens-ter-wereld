@@ -1,6 +1,9 @@
 <template>
   <div>
-    <input v-model="answer.value" @change="saveAnswer" class="rounded w-full p-2" type="text">
+    <div class="flex items-center mb-2">
+      <div class="rounded-full h-6 w-6 flex mr-2 items-center justify-center">{{ itemNo }}</div>
+      <input v-model="answer.value" @change="saveAnswer" class="rounded w-full p-2 border-2 border-gray-300 focus:border-gray-800" type="text">
+    </div>
   </div>
 </template>
 
@@ -21,6 +24,7 @@ export default {
   props: {
     answer: {},
     question: {},
+    itemNo: Number
   }
 }
 </script>

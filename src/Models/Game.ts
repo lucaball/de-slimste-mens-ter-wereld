@@ -1,11 +1,11 @@
-import {Column, Entity, ManyToOne, ObjectLiteral, OneToMany} from "typeorm";
+import {Column, Entity, ObjectLiteral, OneToMany} from "typeorm";
 import {BaseResource} from "./BaseResource";
 import {Exclude} from 'class-transformer';
 import {randomString} from "../Functions/scramble";
 import {GameRound} from "./GameRound";
 
 @Entity()
-export class Game extends BaseResource implements ObjectLiteral{
+export class Game extends BaseResource implements ObjectLiteral {
 
     @Column({nullable: true})
     name: string;

@@ -2,7 +2,7 @@
   <div>
     <h2 class="text-3xl">{{ question.value }}</h2>
     <div v-if="answers.length !== 0">
-      <Answer v-for="answer in answers" :key="answer.id" :answer="answer"></Answer>
+      <Answer v-for="(answer, index) in answers" :item-no="index + 1" :key="answer.id" :answer="answer"></Answer>
     </div>
     <p v-else>Geen antwoorden, voeg er toe. </p>
     <button @click="addAnswer"
@@ -26,7 +26,7 @@ export default {
       }).then((response) => {
         this.answers.push(response.data.answer);
       })
-    }
+    },
   },
   props: {
     answers: Array,

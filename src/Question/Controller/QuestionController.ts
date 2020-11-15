@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Inject, Param, Post, Put} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Put} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {GameRound} from "../../Models/GameRound";
 import {Repository} from "typeorm";
@@ -12,7 +12,7 @@ export class QuestionController {
         @InjectRepository(GameRound)
         private gameRoundRepository: Repository<GameRound>,
         @InjectRepository(Question)
-        private questionRepository : Repository<Question>,
+        private questionRepository: Repository<Question>,
         private questionFactory: QuestionFactory
     ) {
     }
@@ -30,44 +30,47 @@ export class QuestionController {
 
     @Get('/:id/answers')
     async getAnswers(
-        @Param() params : any
-    ){
+        @Param() params: any
+    ) {
         const question = await this.questionRepository.createQueryBuilder('question')
             .leftJoinAndSelect('question.answers', 'answers')
-            .where("question.id = :questionId", { "questionId" : params.id})
+            .where("question.id = :questionId", {"questionId": params.id})
             .getOne();
 
         return {
-            "question" : question
+            "question": question
         }
     }
 
     @Put('/:id')
     async updateQuestion(
-        @Body() updateQuestionBody : any,
-        @Param() queryParams : any
-    ){
-        const question : Question = await this.questionRepository.findOne({ id: queryParams.id})
+        @Body() updateQuestionBody: any,
+        @Param() queryParams: any
+    ) {
+        const question: Question = await this.questionRepository.findOne({id: queryParams.id})
         question.value = updateQuestionBody.value;
         question.type = updateQuestionBody.type;
 
         return {
-            question : await this.questionRepository.save([question])
+            question: await this.questionRepository.save([question])
         };
     }
 
     @Delete('/:id')
     async deleteQuestion(
-        @Param() queryParams : any
-    ){
-        const question : Question = await this.questionRepository.findOne({ id: queryParams.id})
-
-        if(null === question){
-            return false;
+        @Param() queryParams: any
+    ) {
+        const question: Question = await this.questionRepository.findOne({id: queryParams.id})
+        if (null === question) {
+            return {
+                success: false
+            };
         }
 
-        this.questionRepository.remove([question]);
+        await this.questionRepository.remove([question]);
 
-        return true;
+        return {
+            success: true
+        };
     }
 }

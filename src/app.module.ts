@@ -14,13 +14,17 @@ import {QuestionFactory} from "./Question/Factory/QuestionFactory";
 import {Question} from "./Models/Question";
 import { AnswerController } from './Answer/Controller/answer.controller';
 import {Answer} from "./Models/Answer";
+import {FileController} from "./Question/Controller/FileController";
+import {MulterModule} from "@nestjs/platform-express";
+
 
 @Module({
     imports: [
+        MulterModule,
         TypeOrmModule.forRoot({}),
         TypeOrmModule.forFeature([Game, GameRound, Question, Answer]),
     ],
-    controllers: [AppController, GameController, QuestionController, AnswerController],
+    controllers: [AppController, GameController, QuestionController, AnswerController, FileController],
     providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory],
 })
 

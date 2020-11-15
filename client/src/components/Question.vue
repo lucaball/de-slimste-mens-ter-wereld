@@ -50,7 +50,7 @@ export default {
     deleteQuestion(){
       axios.delete("/question/" + this.question.id).then((response) => {
         if (response.data){
-          this.$emit('removeFromList', this.question)
+          this.$emit('delete')
         }
       });
     },

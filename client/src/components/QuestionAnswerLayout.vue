@@ -1,6 +1,10 @@
 <template>
   <div>
-    <h2 class="text-3xl">{{ question.value }}</h2>
+    <h2 v-if="question.type === 'text'" class="text-3xl">
+      {{ question.value }}
+    </h2>
+    <img v-else-if="question.type === 'image'" class="inline object-cover w-20 h-20 mr-2 object-cover w-16 h-16 mr-2 rounded" :src="question.value" alt="">
+    <video v-else-if="question.type === 'video'" class="inline object-cover w-20 h-20 mr-2 object-cover w-16 h-16 mr-2 rounded" :src="question.value" alt=""/>
     <div v-if="answers.length !== 0">
       <Answer v-for="(answer, index) in answers" :item-no="index + 1" :key="answer.id" :answer="answer"></Answer>
     </div>

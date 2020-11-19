@@ -41,10 +41,19 @@ import DeleteButton from "./Buttons/DeleteButton";
 export default {
   name: "Question",
   components: {DeleteButton, VideoIcon, VideoType, ImageType, TextType, ImageIcon, TextIcon},
-  created(){
-    if(this.question.value !== ""){
-      return;
+  data(){
+    return {
+      originalType : '',
+      origialValue : ''
     }
+  },
+  watch : {
+    'question.type'  : function() {
+        this.question.value = "";
+    }
+  },
+  mounted() {
+    this.originalType = this.question.type;
   },
   methods: {
     deleteQuestion(){

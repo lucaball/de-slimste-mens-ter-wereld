@@ -21,7 +21,7 @@ export class Answer extends BaseResource {
         this.scrambled = scramble(this.value);
     }
 
-    @ManyToOne(() => Question, question => question.answers)
+    @ManyToOne(() => Question, question => question.answers, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'question_id', referencedColumnName: 'id'})
     question: Question
 }

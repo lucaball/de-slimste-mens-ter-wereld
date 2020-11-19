@@ -16,13 +16,19 @@ import { AnswerController } from './Answer/Controller/answer.controller';
 import {Answer} from "./Models/Answer";
 import {FileController} from "./Question/Controller/FileController";
 import {MulterModule} from "@nestjs/platform-express";
-
+import {Image} from "./Models/Image";
+import {ServeStaticModule} from "@nestjs/serve-static";
+import { join } from 'path';
+import {Video} from "./Models/Video";
 
 @Module({
     imports: [
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', 'client/public'),
+        }),
         MulterModule,
         TypeOrmModule.forRoot({}),
-        TypeOrmModule.forFeature([Game, GameRound, Question, Answer]),
+        TypeOrmModule.forFeature([Game, GameRound, Question, Answer, Image, Video]),
     ],
     controllers: [AppController, GameController, QuestionController, AnswerController, FileController],
     providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory],

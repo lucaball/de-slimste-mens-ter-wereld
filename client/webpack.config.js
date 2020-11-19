@@ -28,7 +28,7 @@ Encore
     .addEntry('main', './src/main.js')
     .addStyleEntry('style', './css/tailwind.css')
     .enableSassLoader()
-    .enableVueLoader(() => {}, { runtimeCompilerBuild: false })
+    .enableVueLoader()
         //.addEntry('page1', './assets/page1.js')
     //.addEntry('page2', './assets/page2.js')
 

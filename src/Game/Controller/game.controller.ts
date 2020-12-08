@@ -1,6 +1,5 @@
-import {Body, Controller, Get, Param, Post, Query} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
 import {GameFactory} from "../Factory/GameFactory";
-import {Request} from "@nestjs/common";
 import {Game} from "../../Models/Game";
 import {GameService} from "../Service/game.service";
 import {GameRound} from "../../Models/GameRound";
@@ -13,11 +12,14 @@ export class GameController {
 
     constructor(
         @InjectRepository(GameRound)
-        private gameRoundRepository : Repository<GameRound>,
+        private gameRoundRepository: Repository<GameRound>,
+        @InjectRepository(Game)
+        private gameRepository: Repository<Game>,
         private gameFactory: GameFactory,
-        private gameService : GameService,
+        private gameService: GameService,
         private gameRoundService: GameRoundService
-    ) {}
+    ) {
+    }
 
     @Post("/create-game")
     async createGame(@Body() createGameBody: any) {
@@ -31,7 +33,7 @@ export class GameController {
 
     private async getFirstRoundUri(game: Game) {
         const gameWithRounds: Game = await this.gameService.getOneWithRounds(game.id);
-        const firstGameRound : GameRound = gameWithRounds.rounds[0];
+        const firstGameRound: GameRound = gameWithRounds.rounds[0];
 
         return "/game/" + game.id + '/rounds/' + firstGameRound.id
     }
@@ -47,9 +49,31 @@ export class GameController {
         request.Inertia.render({
             component: "RoundEdit",
             props: {
-                game : await this.gameService.getOneWithRounds(params.id),
-                round : await this.gameRoundService.getOneWithQuestions(params.roundId)
+                game: await this.gameService.getOneWithRounds(params.id),
+                round: await this.gameRoundService.getOneWithQuestions(params.roundId)
             }
         });
     }
+
+    @Get('game/:id/play')
+    async playGame(
+        @Request() request: Request,
+        @Param() params
+    ) {
+        const gameId = params.id;
+
+        const game = await this.gameService.getOneWithRounds(gameId)
+        game.inProgress = true;
+
+        await this.gameRepository.save(game);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        request.Inertia.render({
+            component: "PlayGame",
+            props : {
+                game: game
+            }
+        })
+    }
+
 }

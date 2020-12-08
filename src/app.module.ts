@@ -20,6 +20,7 @@ import {Image} from "./Models/Image";
 import {ServeStaticModule} from "@nestjs/serve-static";
 import { join } from 'path';
 import {Video} from "./Models/Video";
+import {GamePlayer} from "./Models/GamePlayer";
 
 @Module({
     imports: [
@@ -28,7 +29,7 @@ import {Video} from "./Models/Video";
         }),
         MulterModule,
         TypeOrmModule.forRoot({}),
-        TypeOrmModule.forFeature([Game, GameRound, Question, Answer, Image, Video]),
+        TypeOrmModule.forFeature([Game, GameRound, Question, Answer, Image, Video, GamePlayer]),
     ],
     controllers: [AppController, GameController, QuestionController, AnswerController, FileController],
     providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory],

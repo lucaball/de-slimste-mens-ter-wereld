@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-stretch h-screen">
     <nav id="header" class="w-full top-0 border-b-2 border-black py-4 px-2">
-      <div class="w-11/12 mx-auto flex flex-wrap flex-col">
+      <div class="mx-auto flex flex-wrap flex-col">
         <h3 class="font-bold text-3xl">{{ game.name }}</h3>
         <small>Joincode: {{ game.joinCode }}</small>
       </div>

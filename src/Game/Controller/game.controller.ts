@@ -24,6 +24,8 @@ export class GameController {
     @Post("/create-game")
     async createGame(@Body() createGameBody: any) {
 
+        console.log(createGameBody);
+
         const game: Game = await this.gameFactory.createWithRounds(createGameBody);
 
         return {

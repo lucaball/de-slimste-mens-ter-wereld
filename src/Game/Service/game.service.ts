@@ -13,6 +13,7 @@ export class GameService {
 
         return await this.gameRepository.createQueryBuilder("game")
             .leftJoinAndSelect("game.rounds", "rounds",)
+            .leftJoinAndSelect("game.gamePlayers", "gamePlayers",)
             .where("game.id = :gameid", {gameid: gameId})
             .orderBy('rounds.position', 'ASC')
             .getOne();

@@ -15,28 +15,33 @@
     </div>
     <div class="flex flex-row space-x-4 flex-grow">
       <div class="h-100 w-1/2 p-6">
-        <div class="bg-gray-400 rounded h-full w-full flex justify-center items-center">
-          <span class="text-6xl" v-show="questionHtml.length === 0">Vraag hier.</span>
-          <div v-html="questionHtml">
-            Vraag hier.
+        <div class="flex flex-col h-full">
+          <div class="h-4/5">
+            <span class="text-6xl" v-show="questionHtml.length === 0">Vraag hier.</span>
+            <div v-html="questionHtml">
+              Vraag hier.
+            </div>
+            <button class="bg-blue-400 p-8" @click="$socket.emit('tet', { room : game.id});">HAHAHAHA</button>
           </div>
-        </div>
-        <div class="h-40 flex flex-row flex-wrap">
-          <div class="w1/6 h-20 w-20">1</div>
-          <div class="w1/6  h-20 w-20">1</div>
-          <div class="w1/6  h-20 w-20">1</div>
-          <div class="w1/6  h-20 w-20">1</div>
-          <div class="w1/6  h-20 w-20">1</div>
-          <div class="w1/6  h-20 w-20">1</div>
+          <div class="h-1/5 flex flex-row flex-wrap">
+            <div class="w1/6 h-20 w-20 bg-gray-400">1</div>
+            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
+            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
+            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
+            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
+            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
+          </div>
         </div>
       </div>
       <div class="w-1/2 flex flex-col">
         <div class="flex flex-row justify-center">
-          <button class="w-1/3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded p-8 text-white mx-2 my-4"
-                  @click="startTicking()">Start
+          <button
+              class="w-1/3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded p-8 text-white mx-2 my-4"
+              @click="startTicking()">Start
           </button>
-          <button class="w-1/3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded p-8 text-white mx-2 my-4"
-                  @click="stopTicking()">Stop
+          <button
+              class="w-1/3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded p-8 text-white mx-2 my-4"
+              @click="stopTicking()">Stop
           </button>
         </div>
         <div class="flex flex-row flex-wrap">
@@ -65,19 +70,27 @@ export default {
     return {
       questionHtml: "",
       ticker: {},
-      playingPlayer: {}
+      playingPlayer: {},
     }
   },
   mounted() {
     this.initTicker();
+    this.connectToWebsockets();
+    this.sockets.subscribe('message', function(data){
+      this.questionHtml = data.html;
+    })
   },
   methods: {
+    connectToWebsockets(){
+      let self = this;
+      this.$socket.on('connect', function() {
+        self.$socket.emit('room', self.game.id);
+      });
+    },
     initTicker() {
       this.ticker = timer(1000, 1000).pipe(tap());
     },
     startTicking() {
-
-      console.log(typeof this.ticker);
 
       const tickTick = this.ticker.subscribe(() => {
         this.playingPlayer.seconds -= 1;

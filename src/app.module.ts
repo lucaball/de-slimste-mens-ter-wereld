@@ -21,22 +21,18 @@ import {ServeStaticModule} from "@nestjs/serve-static";
 import { join } from 'path';
 import {Video} from "./Models/Video";
 import {GamePlayer} from "./Models/GamePlayer";
-import {AdminModule} from "@admin-bro/nestjs";
+import { WebsocketsModule } from './websockets/websockets.module';
+import {EventsGateway} from "./websockets/events-gateway";
 
 @Module({
     imports: [
         ServeStaticModule.forRoot({
             rootPath: join(__dirname, '..', 'client/public'),
         }),
-        // AdminModule.createAdmin({
-        //     adminBroOptions : {
-        //         rootPath: '/admin',
-        //         resources: [],
-        //     }
-        // }),
         MulterModule,
         TypeOrmModule.forRoot({}),
         TypeOrmModule.forFeature([Game, GameRound, Question, Answer, Image, Video, GamePlayer]),
+        WebsocketsModule,
     ],
     controllers: [AppController, GameController, QuestionController, AnswerController, FileController],
     providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory],
@@ -56,11 +52,13 @@ export class AppModule implements NestModule {
             <script src="/main.js" defer></script>
             <link rel="stylesheet" href="/main.css">
             <link rel="stylesheet" href="/style.css">
-        
+            
         <!-- Custom data -->
         <title>${viewData.title}</title>
       </head>
-    
+        <script>
+        console.log(${JSON.stringify(page)})
+        </script>
       <!-- The Inertia page object -->
       <body>
         <div  id="app" data-page='${JSON.stringify(page)}'></div>

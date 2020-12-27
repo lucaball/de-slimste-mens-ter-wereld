@@ -6,6 +6,7 @@ import {GameRound} from "../../Models/GameRound";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {GameRoundService} from "../../GameRound/Service/game-round.service";
+import {EventsGateway} from "../../websockets/events-gateway";
 
 @Controller()
 export class GameController {
@@ -17,7 +18,7 @@ export class GameController {
         private gameRepository: Repository<Game>,
         private gameFactory: GameFactory,
         private gameService: GameService,
-        private gameRoundService: GameRoundService
+        private gameRoundService: GameRoundService,
     ) {
     }
 

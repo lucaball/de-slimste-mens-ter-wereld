@@ -58,8 +58,27 @@ export class GameController {
         });
     }
 
-    @Get('game/:id/play')
+    @Get('game/play/:id')
     async playGame(
+        @Request() request: Request,
+        @Param() params
+    ) {
+        const gameId = params.id;
+
+        const game = await this.gameService.getOneWithRounds(gameId)
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        request.Inertia.render({
+            component: "PlayGame",
+            props : {
+                game: game
+            }
+        })
+    }
+
+    @Get('game/:id/play')
+    async adminPlayGame(
         @Request() request: Request,
         @Param() params
     ) {
@@ -68,13 +87,15 @@ export class GameController {
         const game = await this.gameService.getOneWithRounds(gameId)
         game.inProgress = true;
 
+        const activeRound = await this.gameRoundService.getOneWithQuestions(game.rounds[0].id);
         await this.gameRepository.save(game);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         request.Inertia.render({
-            component: "PlayGame",
+            component: "AdminPlayGame",
             props : {
-                game: game
+                game: game,
+                playingRound : activeRound
             }
         })
     }

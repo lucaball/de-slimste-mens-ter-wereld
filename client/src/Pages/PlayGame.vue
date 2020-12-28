@@ -1,60 +1,29 @@
 <template>
-  <div class="flex flex-col h-screen">
-    <div class="flex flex-row flex-grow space-x-2 h-screen/5">
-      <div class="w-1/3 p-6"
-           :key="gamePlayer.id"
-           v-for="gamePlayer in game.gamePlayers"
-           v-on:click="activatePlayer(gamePlayer)">
-        <div
-            class="h-full w-full rounded bg-gray-400 flex justify-center items-center"
-            :class="{ 'border-4 border-gradient-tr-main-gradient' : (playingPlayer === gamePlayer) }"
-        >
-          <span class="text-6xl ">{{ gamePlayer.seconds }}</span>
+  <div class="flex flex-row h-screen flex-grow">
+    <div class="w-3/5 bg-red-200 flex flex-col items-center">
+      <div class="h-3/5 text-3xl flex items-center">
+        {{ activeQuestion.value }}
+      </div>
+      <div class="h-2/5 flex w-full flex-wrap items-center text-center">
+        <div class="answer text-2xl" :key="answer.id" v-for="answer in activeQuestion.answers">
+          <span v-if="answer.value.length > 0">{{answer.value}}</span>
+          <span v-else class="blur">{{ answer.scrambled }}</span>
         </div>
       </div>
     </div>
-    <div class="flex flex-row space-x-4 flex-grow">
-      <div class="h-100 w-1/2 p-6">
-        <div class="flex flex-col h-full">
-          <div class="h-4/5">
-            <span class="text-6xl" v-show="questionHtml.length === 0">Vraag hier.</span>
-            <div v-html="questionHtml">
-              Vraag hier.
-            </div>
-            <button class="bg-blue-400 p-8" @click="$socket.emit('tet', { room : game.id});">HAHAHAHA</button>
-          </div>
-          <div class="h-1/5 flex flex-row flex-wrap">
-            <div class="w1/6 h-20 w-20 bg-gray-400">1</div>
-            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
-            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
-            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
-            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
-            <div class="w1/6  h-20 w-20 bg-gray-400">1</div>
-          </div>
+    <div data-v-dc5e39be="" class="flex flex-col flex-grow space-x-2 items-center flex-grow">
+      <div class="w-3/5 flex-grow p-6"
+           :key="gamePlayer.id"
+           v-for="gamePlayer in game.gamePlayers">
+        <div
+            class="h-full w-full rounded bg-gray-400 flex justify-center items-center"
+            :class="{ 'border-4 border-gradient-tr-main-gradient' : (activePlayer.id === gamePlayer.id ) }">
+          <span class="text-6xl ">{{ gamePlayer.seconds }}</span>
         </div>
       </div>
-      <div class="w-1/2 flex flex-col">
-        <div class="flex flex-row justify-center">
-          <button
-              class="w-1/3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded p-8 text-white mx-2 my-4"
-              @click="startTicking()">Start
-          </button>
-          <button
-              class="w-1/3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded p-8 text-white mx-2 my-4"
-              @click="stopTicking()">Stop
-          </button>
-        </div>
-        <div class="flex flex-row flex-wrap">
-          <button class="w-1/4 p-10" @click="modifySeconds(10);">+10</button>
-          <button class="w-1/4 p-10" @click="modifySeconds(15);">+15</button>
-          <button class="w-1/4 p-10" @click="modifySeconds(20);">+20</button>
-          <button class="w-1/4 p-10" @click="modifySeconds(30);">+30</button>
-          <button class="w-1/4 p-10" @click="modifySeconds(40);">+40</button>
-          <button class="w-1/4 p-10" @click="modifySeconds(50);">+50</button>
-        </div>
-        <div class="flex">
-          <button @click="modifySeconds(-20)">-20</button>
-        </div>
+      <div data-v-dc5e39be="" class="w-3/5 flex-grow p-6">
+        <div data-v-dc5e39be="" class="h-full w-full rounded bg-gray-400 flex justify-center items-center"><span
+            data-v-dc5e39be="" class="text-6xl ">60</span></div>
       </div>
     </div>
   </div>
@@ -68,22 +37,40 @@ export default {
   name: "PlayGame",
   data() {
     return {
-      questionHtml: "",
-      ticker: {},
-      playingPlayer: {},
+      activeQuestion: "",
+      activePlayer : {}
     }
   },
   mounted() {
+    this.subscribeToRoom();
     this.initTicker();
-    this.connectToWebsockets();
-    this.sockets.subscribe('message', function(data){
-      this.questionHtml = data.html;
+
+    this.sockets.subscribe('setQuestion', function (data) {
+      this.activeQuestion = data;
+    });
+
+    this.sockets.subscribe('showAnswer', function(data){
+
+      const answerToShow = this.activeQuestion.answers.find((answer)=> {
+        return answer.id === data.id;
+      });
+
+      answerToShow.value = data.value;
     })
+
+    this.sockets.subscribe('activateUser', function(activePlayer){
+      this.activePlayer = this.game.gamePlayers.find((gamePlayer) => gamePlayer.id === activePlayer.player.id)
+    })
+
+    const self = this;
+    this.sockets.subscribe('startTicking', () => self.startTicking())
+    this.sockets.subscribe('stopTicking', () => self.stopTicking());
   },
+
   methods: {
-    connectToWebsockets(){
-      let self = this;
-      this.$socket.on('connect', function() {
+    subscribeToRoom() {
+      const self = this;
+      this.$socket.on('connect', function () {
         self.$socket.emit('room', self.game.id);
       });
     },
@@ -93,7 +80,7 @@ export default {
     startTicking() {
 
       const tickTick = this.ticker.subscribe(() => {
-        this.playingPlayer.seconds -= 1;
+        this.activePlayer.seconds -= 1;
       })
 
       this.ticker = tickTick;
@@ -102,25 +89,36 @@ export default {
       await this.ticker.unsubscribe();
       this.initTicker();
     },
-    activatePlayer(player) {
-      this.$set(this, 'playingPlayer', player);
-    },
     modifySeconds(seconds) {
 
-      if (this.playingPlayer === null) {
+      if (this.activePlayer === null) {
         return;
       }
 
-      this.playingPlayer.seconds += seconds;
+      this.activePlayer.seconds += seconds;
     }
   },
   props: {
-    activePlayer: String,
     game: {}
   }
 }
 </script>
 
 <style scoped>
+  .answer{
+    flex: 1 0 33.33%;
+    max-width: 50%;
+  }
 
+  .blur {
+    color: transparent;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+  }
 </style>

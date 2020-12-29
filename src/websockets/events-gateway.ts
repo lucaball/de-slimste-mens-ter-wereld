@@ -51,4 +51,11 @@ export class EventsGateway implements OnGatewayConnection {
     async stopTicking(@MessageBody() data: any) {
         this.server.in(data.room).emit('stopTicking');
     }
+
+    @SubscribeMessage('initAddSeconds')
+    async addSeconds(@MessageBody() data: any) {
+        this.server.in(data.room).emit('addSeconds', {
+            seconds: data.seconds
+        });
+    }
 }

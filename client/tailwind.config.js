@@ -5,13 +5,17 @@ module.exports = {
   },
   purge: [],
   theme: {
+    colors : {
+      white: '#fff',
+      start : "rgb(206,89,63)",
+      end: "rgb(85,10,18)"
+    },
     fontFamily: {
       sans: ['Rubik', 'sans-serif']
     },
     linearBorderGradients: theme => ({
       colors: {
         ...theme('colors'),
-        'main-gradient' : ['rgb(246, 224, 94)', 'rgb(245, 101, 101)', 'rgb(237, 100, 166)']
       }
     }),
     extend: {
@@ -33,3 +37,6 @@ module.exports = {
     require('tailwindcss-border-gradients')(),
   ],
 }
+
+//
+//

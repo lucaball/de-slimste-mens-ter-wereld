@@ -5,10 +5,8 @@
            :key="gamePlayer.id"
            v-for="gamePlayer in game.gamePlayers"
            v-on:click="activatePlayer(gamePlayer)">
-        <div
-            class="h-full w-full rounded bg-gray-400 flex justify-center items-center"
-            :class="{ 'border-4 border-gradient-tr-main-gradient' : (playingPlayer === gamePlayer) }"
-        >
+        <div class="h-full w-full rounded bg-gray-400 flex justify-center items-center"
+             :class="{ 'border-4 border-gradient-tr-main-gradient' : (playingPlayer === gamePlayer) }">
           <span class="text-6xl ">{{ gamePlayer.seconds }}</span>
         </div>
       </div>
@@ -16,19 +14,32 @@
     <div class="flex flex-row space-x-4 flex-grow">
       <div class="h-100 w-1/2 p-6">
         <div class="flex flex-row h-full">
-          <div class="w-1/2">
-            <div class="bg-gray-400 p-4 mb-2 cursor-pointer"
-                 v-for="question in playingRound.questions" :key="question.id">
-              <span @click="$socket.emit('activateQuestion' , {
-                   room: game.id,
-                   ...question
-                 })">
+          <div class="w-1/2 p-2">
+            <div class="bg-main-gradient text-white p-4 mb-2 cursor-pointer rounded bg-gradient-to-bl from-start to-end"
+                 @click="roundIndex -= 1">Previous round
+            </div>
+            <div @click="wsEmit('activateQuestion' , question); setActiveQuestionAnswers(question.answers)"
+                 class="bg-gray-400 p-4 mb-2 cursor-pointer rounded"
+                 v-for="question in activeRound.questions"
+                 :key="question.id">
+              <span>
                 {{ question.value }}
               </span>
-              <div v-for="answer in question.answers" :key="answer.key"
-                   @click="$socket.emit('initShowAnswer', { room: game.id,  id: answer.id, value: answer.value })">
-                {{ answer.value }}
-              </div>
+            </div>
+            <div class="p-4 mb-2 cursor-pointer rounded bg-gradient-to-bl from-start to-end text-white"
+                 @click="roundIndex += 1">Next round
+            </div>
+          </div>
+          <div class="w-1/2 p-2">
+            <div class="bg-gray-400 p-4 mb-2 cursor-pointer rounded"
+                 :class="{ 'border-4 border-gradient-tr-main-gradient' : answer.isShown }"
+                 v-for="(answer, index) in activeQuestionAnswers"
+                 :key="answer.key"
+                 v-on:click="activateAnswer(answer, index)">
+              <label :for="answer.id">
+                <input class="hidden" :id="answer.id" type="checkbox" v-model="answer.isShown">
+                {{ answer.value }} - {{ answer.isShown }}
+              </label>
             </div>
           </div>
         </div>
@@ -44,7 +55,7 @@
               @click="stopTicking()">Stop
           </button>
         </div>
-        <div class="flex flex-row flex-wrap">
+        <div class="flex flex-col flex-wrap">
           <button class="w-1/4 p-10" @click="modifySeconds(10);">+10</button>
           <button class="w-1/4 p-10" @click="modifySeconds(15);">+15</button>
           <button class="w-1/4 p-10" @click="modifySeconds(20);">+20</button>
@@ -68,6 +79,8 @@ export default {
   name: "AdminPlayGame",
   data() {
     return {
+      roundIndex: 0,
+      activeQuestionAnswers: [],
       questionHtml: "",
       ticker: {},
       playingPlayer: {},
@@ -76,14 +89,24 @@ export default {
   mounted() {
     this.initTicker();
     this.connectToWebsockets();
-    this.sockets.subscribe('message', function(data){
+
+    this.sockets.subscribe('message', function (data) {
       this.questionHtml = data.html;
     })
   },
+  computed: {
+    activeRound: function () {
+      return this.game.rounds[this.roundIndex];
+    }
+  },
   methods: {
-    connectToWebsockets(){
+    activateAnswer(answer, index) {
+      this.activeQuestionAnswers[index].isShown = true;
+      this.wsEmit('initShowAnswer', {id: answer.id, value: answer.value});
+    },
+    connectToWebsockets() {
       let self = this;
-      this.$socket.on('connect', function() {
+      this.$socket.on('connect', function () {
         self.$socket.emit('room', self.game.id);
       });
     },
@@ -92,29 +115,33 @@ export default {
     },
     startTicking() {
 
-      const tickTick = this.ticker.subscribe(() => {
+      this.ticker = this.ticker.subscribe(() => {
         this.playingPlayer.seconds -= 1;
-      })
-
-      this.ticker = tickTick;
-      this.$socket.emit('initStartTicking', {
-        room : this.game.id
       });
+
+      this.wsEmit('initStartTicking');
     },
+
     async stopTicking() {
       await this.ticker.unsubscribe();
       this.initTicker();
-      this.$socket.emit('initStopTicking', {
-        room : this.game.id
-      });
+      this.wsEmit('initStopTicking');
     },
+
     activatePlayer(player) {
       this.$set(this, 'playingPlayer', player);
-      this.$socket.emit('initActivateUser', {
-        room : this.game.id,
+      this.wsEmit('initActivateUser', {
         player: player
       });
     },
+
+    wsEmit(event, body) {
+      this.$socket.emit(event, {
+        room: this.game.id,
+        ...body,
+      });
+    },
+
     modifySeconds(seconds) {
 
       if (this.playingPlayer === null) {
@@ -122,10 +149,16 @@ export default {
       }
 
       this.playingPlayer.seconds += seconds;
+      this.wsEmit('initAddSeconds', {seconds: seconds})
+    },
+    setActiveQuestionAnswers(answers) {
+      this.activeQuestionAnswers = answers.map((answer) => {
+        answer.isShown = false;
+        return answer;
+      });
     }
   },
   props: {
-    playingRound : {},
     game: {}
   }
 }

@@ -12,8 +12,10 @@ export class GameService {
     async getOneWithRounds(gameId: string): Promise<Game | null> {
 
         return await this.gameRepository.createQueryBuilder("game")
-            .leftJoinAndSelect("game.rounds", "rounds",)
-            .leftJoinAndSelect("game.gamePlayers", "gamePlayers",)
+            .leftJoinAndSelect("game.rounds", "rounds")
+            .leftJoinAndSelect("rounds.questions", "questions")
+            .leftJoinAndSelect("questions.answers", "answers")
+            .leftJoinAndSelect("game.gamePlayers", "gamePlayers")
             .where("game.id = :gameid", {gameid: gameId})
             .orderBy('rounds.position', 'ASC')
             .getOne();

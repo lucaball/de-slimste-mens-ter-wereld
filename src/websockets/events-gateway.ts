@@ -11,17 +11,46 @@ import {QuestionService} from "../Question/Service/question.service";
 @WebSocketGateway({namespace: '/games'})
 export class EventsGateway implements OnGatewayConnection {
 
-    constructor(private questionService: QuestionService) {
-    }
+    constructor(private questionService: QuestionService) {}
 
     @WebSocketServer()
     server: Server
+
+    private activeConnectedUsers = [];
 
     handleConnection(client: Socket, room: string): any {
         client.on('room', function(room) {
             client.join(room);
         });
     }
+
+    @SubscribeMessage('join-room')
+    async joinRoom(socket: Socket, room: string){
+
+        if(this.activeConnectedUsers[room]){
+            this.activeConnectedUsers[room].push(socket.id);
+        }else{
+            this.activeConnectedUsers[room] = [socket.id];
+        }
+
+        this.server.emit('all-joined-players',  this.activeConnectedUsers[room].filter(id => id !== socket.id))
+    }
+
+    @SubscribeMessage("sending-signal")
+    async sendingSignal(socket: Socket, payload){
+        this.server.to(payload.userToSignal).emit('user-joined', {
+            signal: payload.signal,
+            callerID : payload.callerID
+        })
+    };
+
+    @SubscribeMessage("returning-signal")
+    async returningSignal(socket: Socket, payload){
+        this.server.to(payload.callerID).emit('receiving-returned-signal', {
+            signal: payload.signal,
+            id: socket.id
+        })
+    };
 
     @SubscribeMessage('activateQuestion')
     async activateQuestion(@MessageBody() data: any) {

@@ -1,10 +1,11 @@
 <template>
-  <div class="flex md:flex-col lg:flex-row lg:h-screen lg:flex-grow">
-    <div class="w-1/2 bg-gradient-to-bl from-start to-end flex flex-col items-center">
+  <div class="flex md:flex-col lg:flex-row lg:h-screen lg:flex-grow text-shadow-sm">
+    <div class="w-4/5 bg-gradient-to-bl from-start to-end flex flex-col items-center">
       <div class="h-3/5 text-3xl w-full flex items-center justify-center text-center p-4">
-        <span class="text-white text-shadow-sm" v-if="activeQuestion.type === 'text'"> {{ activeQuestion.value }}</span>
+        <span class="text-white" v-if="activeQuestion.type === 'text'"> {{ activeQuestion.value }}</span>
         <img class="max-h-full" v-if="activeQuestion.type === 'image'" :src="activeQuestion.value" alt=""/>
-        <video class="max-h-full" :src="activeQuestion.value" ref="video" autoplay v-if="activeQuestion.type === 'video'"/>
+        <video class="max-h-full" :src="activeQuestion.value" ref="video" autoplay
+               v-if="activeQuestion.type === 'video'"/>
       </div>
       <div class="h-2/5 flex w-full flex-wrap items-center text-center">
         <div class="answer text-2xl" :key="answer.id" v-for="answer in activeQuestion.answers">
@@ -13,19 +14,23 @@
         </div>
       </div>
     </div>
-    <div data-v-dc5e39be="" class="flex flex-row flex-wrap flex-grow">
-      <div class="w-1/2"
-           :key="gamePlayer.id"
-           v-for="gamePlayer in game.gamePlayers">
-        <div
-            class="h-full w-full rounded bg-gray-400 flex justify-center items-center"
-            :class="{ 'border-4 border-gradient-tr-main-gradient' : (activePlayer.id === gamePlayer.id ) }">
-          <span class="text-6xl ">{{ gamePlayer.seconds }}</span>
+    <div class="flex flex-col flex-grow">
+<!--      <div class="flex-1" :key="gamePlayer.id" v-for="(gamePlayer, index) in game.gamePlayers">-->
+<!--        <div class="h-full w-full relative"-->
+<!--            :class="{ 'border-4 border-gradient-tr-main-gradient' : (activePlayer.id === gamePlayer.id ) }">-->
+<!--          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">{{ gamePlayer.seconds }}</span>-->
+<!--          <video autoplay muted class="h-full w-full object-cover absolute" ref="player_video" autoPlay></video>-->
+<!--        </div>-->
+<!--      </div>-->
+      <div class="flex-1" v-for="peer in peers">
+        <div class="h-full w-full relative">
+          <PlayerVideo :peer="peer"></PlayerVideo>
         </div>
       </div>
-      <div data-v-dc5e39be="" class="w-1/2">
-        <div data-v-dc5e39be="" class="h-full w-full rounded bg-gray-400 flex justify-center items-center"><span
-            data-v-dc5e39be="" class="text-6xl">60</span></div>
+      <div class="flex-1">
+        <div class="h-full w-full rounded bg-gray-400 flex justify-center items-center relative">
+          <video muted autoplay class="h-full w-full object-cover absolute" id="local-video" ref="adminVideo"></video>
+        </div>
       </div>
     </div>
   </div>
@@ -34,30 +39,66 @@
 <script>
 import {timer} from "rxjs";
 import {tap} from "rxjs/operators";
+import Peer from "simple-peer";
+import PlayerVideo from "../components/PlayGame/PlayerVideo";
 
 export default {
   name: "PlayGame",
+  components: {PlayerVideo},
   data() {
     return {
       activeQuestion: "",
-      activePlayer: {}
+      activePlayer: {},
+      peers : [],
+      activeIndex: 0
     }
   },
-  watch : {
-    activeQuestion : function(question){
-      if(question.type === "video"){
+  watch: {
+    activeQuestion: function (question) {
+      if (question.type === "video") {
         this.$refs.video.play();
       }
     }
   },
   mounted() {
+
     this.subscribeToRoom();
     this.initTicker();
+
+    this.currentPlayer = this.game.gamePlayers[0]
+
+    navigator.mediaDevices.getUserMedia({video: true, audio: true})
+        .then((stream) => {
+
+          this.$refs.adminVideo.srcObject = stream;
+          this.$socket.emit('join-room', this.game.id);
+
+          this.sockets.subscribe('all-joined-players', players => {
+            players.forEach((player) => {
+              const peer = this.createPeer(player, this.sockets.id, stream);
+              this.peers.push({peerID: player, peer});
+            })
+          });
+
+          this.sockets.subscribe('user-joined', (data) => {
+            const peer = this.addPeer(data.signal, data.callerID, stream);
+            this.peers.push({ peerID: data.callerID, peer});
+          });
+
+          this.sockets.subscribe('receiving-returned-signal', (payload) => {
+            const item = this.peers.find(p => p.peerID === payload.id);
+            console.log(item);
+            item.peer.signal(payload.signal);
+          });
+
+
+        })
+        .catch(error => { console.log(error); })
+    ;
 
     this.sockets.subscribe('setQuestion', function (data) {
       this.activeQuestion = data;
     });
-
     this.sockets.subscribe('showAnswer', function (data) {
 
       const answerToShow = this.activeQuestion.answers.find((answer) => {
@@ -65,26 +106,22 @@ export default {
       });
 
       answerToShow.value = data.value;
-    })
-
+    });
     this.sockets.subscribe('addSeconds', function (data) {
       this.activePlayer.seconds += data.seconds;
-    })
-
+    });
     this.sockets.subscribe('activateUser', function (activePlayer) {
       this.activePlayer = this.game.gamePlayers.find((gamePlayer) => gamePlayer.id === activePlayer.player.id)
     })
-
-    const self = this;
-    this.sockets.subscribe('startTicking', () => self.startTicking())
-    this.sockets.subscribe('stopTicking', () => self.stopTicking());
+    this.sockets.subscribe('startTicking', () => this.startTicking())
+    this.sockets.subscribe('stopTicking', () => this.stopTicking());
+    this.sockets.subscribe('stopTicking', () => this.stopTicking());
   },
 
   methods: {
     subscribeToRoom() {
-      const self = this;
-      this.$socket.on('connect', function () {
-        self.$socket.emit('room', self.game.id);
+      this.$socket.on('connect', () => {
+        this.$socket.emit('room', this.game.id);
       });
     },
     initTicker() {
@@ -109,6 +146,33 @@ export default {
       }
 
       this.activePlayer.seconds += seconds;
+    },
+    createPeer(userToSignal, callerID, stream){
+
+      const peer = new Peer({
+        initiator: true,
+        trickle: false,
+        stream,
+      });
+
+      peer.on('signal', (signal) => this.$socket.emit('sending-signal', { userToSignal, callerID, signal}));
+
+      return peer;
+    },
+    addPeer(incomingSignal, callerID, stream) {
+      const peer = new Peer({
+        initiator: false,
+        trickle: false,
+        stream,
+      })
+
+      peer.on("signal", signal => {
+        this.$socket.emit("returning-signal", {signal, callerID})
+      })
+
+      peer.signal(incomingSignal);
+
+      return peer;
     }
   },
   props: {
@@ -119,7 +183,16 @@ export default {
 
 <style scoped>
 
-*{
+.player-seconds{
+  z-index:10;
+  min-width: 85px;
+  border-radius: 50%;
+  position: absolute;
+  left: 10px;
+  bottom: 10px ;
+  font-size: 1.5rem;
+}
+* {
   text-shadow: 0 0 10px rgba(9, 9, 9, 0.5);
 }
 

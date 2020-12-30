@@ -16,6 +16,7 @@ module.exports = {
     linearBorderGradients: theme => ({
       colors: {
         ...theme('colors'),
+        'main-gradient' : ['rgb(206,89,63)', 'rgb(85,10,18)'],
       }
     }),
     extend: {

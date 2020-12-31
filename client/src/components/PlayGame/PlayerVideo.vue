@@ -1,5 +1,5 @@
 <template>
-  <video autoplay muted class="h-full w-full object-cover absolute" ref="player_video"></video>
+  <video autoplay class="h-full w-full object-cover absolute" ref="player_video"></video>
 </template>
 
 <script>

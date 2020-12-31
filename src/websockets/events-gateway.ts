@@ -33,7 +33,7 @@ export class EventsGateway implements OnGatewayConnection {
             this.activeConnectedUsers[room] = [socket.id];
         }
 
-        this.server.emit('all-joined-players',  this.activeConnectedUsers[room].filter(id => id !== socket.id))
+        this.server.to(socket.id).emit('all-joined-players',  this.activeConnectedUsers[room].filter(id => id !== socket.id))
     }
 
     @SubscribeMessage("sending-signal")
@@ -44,14 +44,9 @@ export class EventsGateway implements OnGatewayConnection {
         })
     };
 
-    @SubscribeMessage("returning-signal")
-    async returningSignal(socket: Socket, payload){
-        this.server.to(payload.callerID).emit('receiving-returned-signal', {
-            signal: payload.signal,
-            id: socket.id
-        })
-    };
-
+    /***************
+     *  QUESTIONS  *
+     **************/
     @SubscribeMessage('activateQuestion')
     async activateQuestion(@MessageBody() data: any) {
 

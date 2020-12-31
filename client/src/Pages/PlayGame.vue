@@ -39,7 +39,7 @@
 <script>
 import {timer} from "rxjs";
 import {tap} from "rxjs/operators";
-import Peer from "simple-peer";
+import SimplePeer from "simple-peer";
 import PlayerVideo from "../components/PlayGame/PlayerVideo";
 
 export default {
@@ -50,7 +50,8 @@ export default {
       activeQuestion: "",
       activePlayer: {},
       peers : [],
-      activeIndex: 0
+      activeIndex: 0,
+      currentStream : null,
     }
   },
   watch: {
@@ -69,13 +70,16 @@ export default {
 
     navigator.mediaDevices.getUserMedia({video: true, audio: true})
         .then((stream) => {
-
-          this.$refs.adminVideo.srcObject = stream;
+          // Join the current room
           this.$socket.emit('join-room', this.game.id);
+          this.$refs.adminVideo.srcObject = stream;
+          this.currentStream = stream;
+
+
 
           this.sockets.subscribe('all-joined-players', players => {
             players.forEach((player) => {
-              const peer = this.createPeer(player, this.sockets.id, stream);
+              const peer = this.createPeer(player, this.sockets.id);
               this.peers.push({peerID: player, peer});
             })
           });
@@ -147,23 +151,30 @@ export default {
 
       this.activePlayer.seconds += seconds;
     },
-    createPeer(userToSignal, callerID, stream){
+    createPeer(userToSignal, callerID, initiator = false){
 
-      const peer = new Peer({
-        initiator: true,
+      const peer = new SimplePeer({
+        initiator: initiator,
         trickle: false,
-        stream,
+        stream: this.stream,
+        config: {
+          "iceServers": [{
+            "urls": "stun:stun.l.google.com:19302"
+          }]
+        }
       });
 
-      peer.on('signal', (signal) => this.$socket.emit('sending-signal', { userToSignal, callerID, signal}));
+      peer.on('signal', (signal) => {
+        this.$socket.emit('sending-signal', {userToSignal, callerID, signal});
+      });
 
       return peer;
     },
-    addPeer(incomingSignal, callerID, stream) {
-      const peer = new Peer({
-        initiator: false,
+    addPeer(incomingSignal, callerID, initiator = false) {
+      const peer = new SimplePeer({
+        initiator: initiator,
         trickle: false,
-        stream,
+        stream: this.stream,
       })
 
       peer.on("signal", signal => {

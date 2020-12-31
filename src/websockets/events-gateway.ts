@@ -18,31 +18,40 @@ export class EventsGateway implements OnGatewayConnection {
 
     private activeConnectedUsers = [];
 
-    handleConnection(client: Socket, room: string): any {
-        client.on('room', function(room) {
-            client.join(room);
+    handleConnection(socket: Socket, room: string): any {
+
+        socket.on('room', (room) => {
+            socket.join(room);
         });
-    }
 
-    @SubscribeMessage('join-room')
-    async joinRoom(socket: Socket, room: string){
+        this.activeConnectedUsers.push(socket.id);
+        this.activeConnectedUsers[socket.id] =  socket;
 
-        if(this.activeConnectedUsers[room]){
-            this.activeConnectedUsers[room].push(socket.id);
-        }else{
-            this.activeConnectedUsers[room] = [socket.id];
-        }
+        this.activeConnectedUsers.forEach(id => {
+            if(id !== socket.id){
+                this.activeConnectedUsers[id].emit('initReceive', socket.id)
+            }
+        });
 
-        this.server.to(socket.id).emit('all-joined-players',  this.activeConnectedUsers[room].filter(id => id !== socket.id))
-    }
+        socket.on('signal', data => {
 
-    @SubscribeMessage("sending-signal")
-    async sendingSignal(socket: Socket, payload){
-        this.server.to(payload.userToSignal).emit('user-joined', {
-            signal: payload.signal,
-            callerID : payload.callerID
+            if(!this.activeConnectedUsers.includes(data.socket_id)) return;
+
+            this.activeConnectedUsers[data.socket_id].emit('signal', {
+                socket_id: socket.id,
+                signal: data.signal
+            })
+        });
+
+        socket.on('initSend', init_socket_id => {
+            this.activeConnectedUsers[init_socket_id].emit('initSend', socket.id);
+        });
+
+        socket.on('disconnect', () => {
+            const index = this.activeConnectedUsers.indexOf(socket.id);
+            delete this.activeConnectedUsers[index]
         })
-    };
+    }
 
     /***************
      *  QUESTIONS  *

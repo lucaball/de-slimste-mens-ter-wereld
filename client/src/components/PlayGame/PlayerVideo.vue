@@ -6,8 +6,12 @@
 export default {
   name: "PlayerVideo",
   mounted() {
-    this.peer.peer.on('stream',(stream) => {
-      this.$refs.player_video.srcObject = stream;
+    this.peer.on('stream',(stream) => {
+      const newVid = this.$refs.player_video;
+      newVid.srcObject = stream;
+      newVid.playsinline = false
+      newVid.autoplay = true
+      newVid.className = "vid"
     })
   },
   props: {

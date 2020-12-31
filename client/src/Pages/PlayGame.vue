@@ -15,13 +15,13 @@
       </div>
     </div>
     <div class="flex flex-col flex-grow">
-<!--      <div class="flex-1" :key="gamePlayer.id" v-for="(gamePlayer, index) in game.gamePlayers">-->
-<!--        <div class="h-full w-full relative"-->
-<!--            :class="{ 'border-4 border-gradient-tr-main-gradient' : (activePlayer.id === gamePlayer.id ) }">-->
-<!--          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">{{ gamePlayer.seconds }}</span>-->
-<!--          <video autoplay muted class="h-full w-full object-cover absolute" ref="player_video" autoPlay></video>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--      <div class="flex-1" :key="gamePlayer.id" v-for="(gamePlayer, index) in game.gamePlayers">-->
+      <!--        <div class="h-full w-full relative"-->
+      <!--            :class="{ 'border-4 border-gradient-tr-main-gradient' : (activePlayer.id === gamePlayer.id ) }">-->
+      <!--          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">{{ gamePlayer.seconds }}</span>-->
+      <!--          <video autoplay muted class="h-full w-full object-cover absolute" ref="player_video" autoPlay></video>-->
+      <!--        </div>-->
+      <!--      </div>-->
       <div class="flex-1" v-for="peer in peers">
         <div class="h-full w-full relative">
           <PlayerVideo :peer="peer"></PlayerVideo>
@@ -39,7 +39,7 @@
 <script>
 import {timer} from "rxjs";
 import {tap} from "rxjs/operators";
-import SimplePeer from "simple-peer";
+import SimplePeer from 'simple-peer';
 import PlayerVideo from "../components/PlayGame/PlayerVideo";
 
 export default {
@@ -49,9 +49,9 @@ export default {
     return {
       activeQuestion: "",
       activePlayer: {},
-      peers : [],
+      peers: {},
       activeIndex: 0,
-      currentStream : null,
+      currentStream: null,
     }
   },
   watch: {
@@ -70,35 +70,28 @@ export default {
 
     navigator.mediaDevices.getUserMedia({video: true, audio: true})
         .then((stream) => {
-          // Join the current room
-          this.$socket.emit('join-room', this.game.id);
-          this.$refs.adminVideo.srcObject = stream;
-          this.currentStream = stream;
-
-
-
-          this.sockets.subscribe('all-joined-players', players => {
-            players.forEach((player) => {
-              const peer = this.createPeer(player, this.sockets.id);
-              this.peers.push({peerID: player, peer});
-            })
-          });
-
-          this.sockets.subscribe('user-joined', (data) => {
-            const peer = this.addPeer(data.signal, data.callerID, stream);
-            this.peers.push({ peerID: data.callerID, peer});
-          });
-
-          this.sockets.subscribe('receiving-returned-signal', (payload) => {
-            const item = this.peers.find(p => p.peerID === payload.id);
-            console.log(item);
-            item.peer.signal(payload.signal);
-          });
-
-
+          this.$set(this, 'currentStream', stream)
+          this.$refs.adminVideo.srcObject = this.currentStream
+          this.$refs.adminVideo.play();
         })
-        .catch(error => { console.log(error); })
+        .catch(error => {
+          console.log(error);
+        })
     ;
+
+    this.sockets.subscribe('initReceive', socket_id => {
+      this.addPeer(socket_id, false);
+
+      this.$socket.emit('initSend', socket_id);
+    });
+
+    this.sockets.subscribe('initSend', socket_id => {
+      this.addPeer(socket_id, true);
+    })
+
+    this.sockets.subscribe('receiveSignal', data => {
+      this.peers[data.socket_id].signal(data.signal);
+    })
 
     this.sockets.subscribe('setQuestion', function (data) {
       this.activeQuestion = data;
@@ -151,58 +144,41 @@ export default {
 
       this.activePlayer.seconds += seconds;
     },
-    createPeer(userToSignal, callerID, initiator = false){
+    addPeer(socket_id, am_initiator) {
 
       const peer = new SimplePeer({
-        initiator: initiator,
-        trickle: false,
-        stream: this.stream,
-        config: {
-          "iceServers": [{
-            "urls": "stun:stun.l.google.com:19302"
-          }]
-        }
-      });
-
-      peer.on('signal', (signal) => {
-        this.$socket.emit('sending-signal', {userToSignal, callerID, signal});
-      });
-
-      return peer;
-    },
-    addPeer(incomingSignal, callerID, initiator = false) {
-      const peer = new SimplePeer({
-        initiator: initiator,
-        trickle: false,
-        stream: this.stream,
+        initiator: am_initiator,
+        stream: this.currentStream,
       })
 
-      peer.on("signal", signal => {
-        this.$socket.emit("returning-signal", {signal, callerID})
+      peer.on('signal', data => {
+        this.$socket.emit('sendSignal', {
+          signal: data,
+          socket_id: socket_id
+        })
       })
 
-      peer.signal(incomingSignal);
-
-      return peer;
+      this.$set(this.peers, socket_id, peer)
     }
   },
   props: {
     game: {}
-  }
+  },
 }
 </script>
 
 <style scoped>
 
-.player-seconds{
-  z-index:10;
+.player-seconds {
+  z-index: 10;
   min-width: 85px;
   border-radius: 50%;
   position: absolute;
   left: 10px;
-  bottom: 10px ;
+  bottom: 10px;
   font-size: 1.5rem;
 }
+
 * {
   text-shadow: 0 0 10px rgba(9, 9, 9, 0.5);
 }

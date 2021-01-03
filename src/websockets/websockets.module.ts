@@ -8,7 +8,9 @@ import {Answer} from "../Models/Answer";
 @Module({
     imports: [
         TypeOrmModule.forFeature([Question, Answer]),
-        WebsocketsModule,
+    ],
+    exports: [
+        EventsGateway
     ],
     providers: [EventsGateway, QuestionService]
 })

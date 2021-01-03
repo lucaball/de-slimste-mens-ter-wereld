@@ -15,16 +15,13 @@
       </div>
     </div>
     <div class="flex flex-col flex-grow">
-      <!--      <div class="flex-1" :key="gamePlayer.id" v-for="(gamePlayer, index) in game.gamePlayers">-->
-      <!--        <div class="h-full w-full relative"-->
-      <!--            :class="{ 'border-4 border-gradient-tr-main-gradient' : (activePlayer.id === gamePlayer.id ) }">-->
-      <!--          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">{{ gamePlayer.seconds }}</span>-->
-      <!--          <video autoplay muted class="h-full w-full object-cover absolute" ref="player_video" autoPlay></video>-->
-      <!--        </div>-->
-      <!--      </div>-->
-      <div class="flex-1" v-for="peer in peers">
-        <div class="h-full w-full relative">
-          <PlayerVideo :peer="peer"></PlayerVideo>
+      <div class="flex-1" :key="gamePlayer.id" v-for="gamePlayer in players">
+        <div class="h-full w-full relative"
+             :class="{ 'border-4 border-gradient-tr-main-gradient' : (activePlayer.id === gamePlayer.id ) }">
+          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">{{
+              gamePlayer.seconds
+            }}</span>
+          <video autoplay muted class="h-full w-full object-cover absolute" :ref="gamePlayer.id"></video>
         </div>
       </div>
       <div class="flex-1">
@@ -39,7 +36,6 @@
 <script>
 import {timer} from "rxjs";
 import {tap} from "rxjs/operators";
-import SimplePeer from 'simple-peer';
 import PlayerVideo from "../components/PlayGame/PlayerVideo";
 
 export default {
@@ -47,9 +43,10 @@ export default {
   components: {PlayerVideo},
   data() {
     return {
-      activeQuestion: "",
       activePlayer: {},
+      activeQuestion: "",
       peers: {},
+      players: [],
       activeIndex: 0,
       currentStream: null,
     }
@@ -63,35 +60,30 @@ export default {
   },
   mounted() {
 
-    this.subscribeToRoom();
+    this.$socket.emit('playerJoined', {
+      player: {
+        ...this.player,
+        game: null,
+      },
+      room: this.game.id
+    });
+
+    this.players = this.game.gamePlayers;
+    this.players.push(this.player);
     this.initTicker();
 
     this.currentPlayer = this.game.gamePlayers[0]
 
     navigator.mediaDevices.getUserMedia({video: true, audio: true})
         .then((stream) => {
-          this.$set(this, 'currentStream', stream)
-          this.$refs.adminVideo.srcObject = this.currentStream
-          this.$refs.adminVideo.play();
+          this.currentStream = stream;
+          this.$refs[this.player.id][0].srcObject = this.currentStream
+          this.$refs[this.player.id][0].play();
         })
         .catch(error => {
-          console.log(error);
+          console.log(error)
         })
     ;
-
-    this.sockets.subscribe('initReceive', socket_id => {
-      this.addPeer(socket_id, false);
-
-      this.$socket.emit('initSend', socket_id);
-    });
-
-    this.sockets.subscribe('initSend', socket_id => {
-      this.addPeer(socket_id, true);
-    })
-
-    this.sockets.subscribe('receiveSignal', data => {
-      this.peers[data.socket_id].signal(data.signal);
-    })
 
     this.sockets.subscribe('setQuestion', function (data) {
       this.activeQuestion = data;
@@ -107,6 +99,9 @@ export default {
     this.sockets.subscribe('addSeconds', function (data) {
       this.activePlayer.seconds += data.seconds;
     });
+    this.sockets.subscribe('playerHasJoined', function (data) {
+      this.players.push(data);
+    });
     this.sockets.subscribe('activateUser', function (activePlayer) {
       this.activePlayer = this.game.gamePlayers.find((gamePlayer) => gamePlayer.id === activePlayer.player.id)
     })
@@ -116,11 +111,6 @@ export default {
   },
 
   methods: {
-    subscribeToRoom() {
-      this.$socket.on('connect', () => {
-        this.$socket.emit('room', this.game.id);
-      });
-    },
     initTicker() {
       this.ticker = timer(1000, 1000).pipe(tap());
     },
@@ -144,24 +134,9 @@ export default {
 
       this.activePlayer.seconds += seconds;
     },
-    addPeer(socket_id, am_initiator) {
-
-      const peer = new SimplePeer({
-        initiator: am_initiator,
-        stream: this.currentStream,
-      })
-
-      peer.on('signal', data => {
-        this.$socket.emit('sendSignal', {
-          signal: data,
-          socket_id: socket_id
-        })
-      })
-
-      this.$set(this.peers, socket_id, peer)
-    }
   },
   props: {
+    player: {},
     game: {}
   },
 }

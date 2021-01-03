@@ -22,7 +22,7 @@ import { join } from 'path';
 import {Video} from "./Models/Video";
 import {GamePlayer} from "./Models/GamePlayer";
 import { WebsocketsModule } from './websockets/websockets.module';
-import {EventsGateway} from "./websockets/events-gateway";
+import {GamePlayerFactory} from "./GamePlayer/Factory/GamePlayerFactory";
 
 @Module({
     imports: [
@@ -35,7 +35,7 @@ import {EventsGateway} from "./websockets/events-gateway";
         WebsocketsModule,
     ],
     controllers: [AppController, GameController, QuestionController, AnswerController, FileController],
-    providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory],
+    providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory, GamePlayerFactory],
 })
 
 export class AppModule implements NestModule {

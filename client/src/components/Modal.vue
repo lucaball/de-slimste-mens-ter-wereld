@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <div class="modal flex content-center flex-wrap" v-if="show">
-      <div class="modal__backdrop" @click="closeModal()"/>
+      <div class="modal__backdrop" @click="close()"/>
 
       <div class="modal__dialog">
         <div class="modal__header">
@@ -30,12 +30,12 @@ export default {
     };
   },
   methods: {
-    closeModal() {
+    close() {
       this.show = false;
       document.querySelector("body").classList.remove("overflow-hidden");
       this.$emit('close', true)
     },
-    openModal() {
+    open() {
       this.show = true;
       document.querySelector("body").classList.add("overflow-hidden");
       this.$emit('open', true)

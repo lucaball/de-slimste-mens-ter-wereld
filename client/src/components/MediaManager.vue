@@ -63,10 +63,10 @@ export default {
         });
       }
 
-      this.$refs.mediaManagerModal.openModal();
+      this.$refs.mediaManagerModal.open();
     },
     close() {
-      this.$refs.mediaManagerModal.closeModal();
+      this.$refs.mediaManagerModal.close();
     }
   }
 }

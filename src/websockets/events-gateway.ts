@@ -16,42 +16,30 @@ export class EventsGateway implements OnGatewayConnection {
     @WebSocketServer()
     server: Server
 
-    private activeConnectedUsers = [];
+    private connectedSockets = [];
 
-    handleConnection(socket: Socket, room: string): any {
-
-        socket.on('room', (room) => {
-            socket.join(room);
-        });
-
-        this.activeConnectedUsers.push(socket.id);
-        this.activeConnectedUsers[socket.id] =  socket;
-
-        this.activeConnectedUsers.forEach(id => {
-            if(id !== socket.id){
-                this.activeConnectedUsers[id].emit('initReceive', socket.id)
-            }
-        });
-
-        socket.on('signal', data => {
-
-            if(!this.activeConnectedUsers.includes(data.socket_id)) return;
-
-            this.activeConnectedUsers[data.socket_id].emit('signal', {
-                socket_id: socket.id,
-                signal: data.signal
-            })
-        });
-
-        socket.on('initSend', init_socket_id => {
-            this.activeConnectedUsers[init_socket_id].emit('initSend', socket.id);
-        });
-
+    handleConnection(socket: Socket, data : any[]): any {
         socket.on('disconnect', () => {
-            const index = this.activeConnectedUsers.indexOf(socket.id);
-            delete this.activeConnectedUsers[index]
+            const index = this.connectedSockets.indexOf(socket.id);
+            delete this.connectedSockets[index];
+        });
+
+        socket.on('playerJoined', (data: any) =>{
+            socket.join(data.room);
+            socket.broadcast.emit('playerHasJoined', data.player);
         })
     }
+
+    // @SubscribeMessage('playerJoined')
+    // joinRoom(socket: Socket, @MessageBody() data: any) {
+    //
+    //     socket.join(data.room);
+    //     socket.broadcast.emit('playerJoined', {
+    //         ... data.player,
+    //         game: null
+    //     });
+    //
+    // }
 
     /***************
      *  QUESTIONS  *

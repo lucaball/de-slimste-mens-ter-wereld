@@ -20,4 +20,16 @@ export class GameService {
             .orderBy('rounds.position', 'ASC')
             .getOne();
     }
+
+    async findForJoinCode(joinCode: string) : Promise<Game | null> {
+
+        return  await this.gameRepository.createQueryBuilder('game')
+            .leftJoinAndSelect("game.rounds", "rounds")
+            .leftJoinAndSelect("rounds.questions", "questions")
+            .leftJoinAndSelect("questions.answers", "answers")
+            .leftJoinAndSelect("game.gamePlayers", "gamePlayers")
+            .where('joinCode = :joinCode', { joinCode: '#' + joinCode })
+            .orderBy('rounds.position', 'ASC')
+            .getOne();
+    }
 }

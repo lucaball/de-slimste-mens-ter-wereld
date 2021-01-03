@@ -16,18 +16,24 @@
         <div class="flex flex-row h-full">
           <div class="w-1/2 p-2">
             <div class="bg-main-gradient text-white p-4 mb-2 cursor-pointer rounded bg-gradient-to-bl from-start to-end"
-                 @click="roundIndex -= 1">Previous round
+                 @click="roundIndex -= 1">Vorige ronde
             </div>
             <div @click="wsEmit('activateQuestion' , question); setActiveQuestionAnswers(question.answers)"
                  class="bg-gray-400 p-4 mb-2 cursor-pointer rounded"
                  v-for="question in activeRound.questions"
                  :key="question.id">
-              <span>
+              <span v-if="question.type === 'image'">
+                  <img class="inline object-cover w-20 h-20 mr-2 object-cover w-16 h-16 mr-2 rounded" :src="question.value" alt="">
+              </span>
+              <span v-if="question.type === 'video'">
+                  <video class="inline object-cover w-20 h-20 mr-2 object-cover w-16 h-16 mr-2 rounded" :src="question.value" alt=""/>
+              </span>
+              <span v-if="question.type === 'text'">
                 {{ question.value }}
               </span>
             </div>
             <div class="p-4 mb-2 cursor-pointer rounded bg-gradient-to-bl from-start to-end text-white"
-                 @click="roundIndex += 1">Next round
+                 @click="roundIndex += 1">Volgende ronde
             </div>
           </div>
           <div class="w-1/2 p-2">
@@ -47,24 +53,22 @@
       <div class="w-1/2 flex flex-col">
         <div class="flex flex-row justify-center">
           <button
-              class="w-1/3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded p-8 text-white mx-2 my-4"
+              class="w-1/3 bg-gradient-to-bl from-start to-end rounded p-8 text-white mx-2 my-4"
               @click="startTicking()">Start
           </button>
           <button
-              class="w-1/3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded p-8 text-white mx-2 my-4"
+              class="w-1/3 bg-gradient-to-bl from-start to-end rounded p-8 text-white mx-2 my-4"
               @click="stopTicking()">Stop
           </button>
         </div>
-        <div class="flex flex-col flex-wrap">
+        <div class="flex flex-row flex-wrap">
           <button class="w-1/4 p-10" @click="modifySeconds(10);">+10</button>
           <button class="w-1/4 p-10" @click="modifySeconds(15);">+15</button>
           <button class="w-1/4 p-10" @click="modifySeconds(20);">+20</button>
           <button class="w-1/4 p-10" @click="modifySeconds(30);">+30</button>
           <button class="w-1/4 p-10" @click="modifySeconds(40);">+40</button>
           <button class="w-1/4 p-10" @click="modifySeconds(50);">+50</button>
-        </div>
-        <div class="flex">
-          <button @click="modifySeconds(-20)">-20</button>
+          <button class="w-1/4 p-10" @click="modifySeconds(-20)">-20</button>
         </div>
       </div>
     </div>

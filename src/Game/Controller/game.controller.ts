@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Query, Request} from '@nestjs/common';
 import {GameFactory} from "../Factory/GameFactory";
 import {Game} from "../../Models/Game";
 import {GameService} from "../Service/game.service";
@@ -6,7 +6,8 @@ import {GameRound} from "../../Models/GameRound";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {GameRoundService} from "../../GameRound/Service/game-round.service";
-import {EventsGateway} from "../../websockets/events-gateway";
+import {GamePlayerFactory} from "../../GamePlayer/Factory/GamePlayerFactory";
+import {EventsGateway} from "../../../dist/events-gateway";
 
 @Controller()
 export class GameController {
@@ -19,6 +20,8 @@ export class GameController {
         private gameFactory: GameFactory,
         private gameService: GameService,
         private gameRoundService: GameRoundService,
+        private gamePlayerFactory: GamePlayerFactory,
+        private eventGateway : EventsGateway
     ) {
     }
 
@@ -58,20 +61,41 @@ export class GameController {
         });
     }
 
-    @Get('game/play/:id')
-    async playGame(
+    @Get('/play')
+    async getJoinGame(
         @Request() request: Request,
-        @Param() params
-    ) {
-        const gameId = params.id;
-
-        const game = await this.gameService.getOneWithRounds(gameId)
+        @Query() query
+    ){
+        const joinCode = query.j;
+        const game = await this.gameService.findForJoinCode(joinCode);
+        const gamePlayer = await this.gamePlayerFactory.createForGame(game);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         request.Inertia.render({
             component: "PlayGame",
             props : {
+                player: gamePlayer,
+                game: game
+            }
+        })
+    }
+
+    @Post('/play')
+    async postJoinGame(
+        @Request() request: Request,
+        @Body() params
+    ) {
+        const joinCode = params.joinCode;
+        const game = await this.gameService.findForJoinCode(joinCode);
+        const gamePlayer = await this.gamePlayerFactory.createForGame(game);
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        request.Inertia.render({
+            component: "PlayGame",
+            props : {
+                player: gamePlayer,
                 game: game
             }
         })
@@ -99,5 +123,4 @@ export class GameController {
             }
         })
     }
-
 }

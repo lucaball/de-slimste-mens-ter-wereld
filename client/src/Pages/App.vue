@@ -1,47 +1,27 @@
 <template>
-  <div class="h-screen pb-14 bg-right bg-cover" style="background-image:url('bg.svg');">
-    <!--Nav-->
-    <div class="w-full container mx-auto p-6">
-      <div class="w-full flex items-center justify-between">
-        <a class="flex items-center text-black-400 no-underline hover:no-underline font-bold text-2xl lg:text-4xl"
-           href="#">
-          DSMTW
-        </a>
-
-        <div class="flex w-1/2 justify-end content-center">
-          <a class="inline-block text-black-300 no-underline hover:text-black-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
-             data-tippy-content="@twitter_handle" href="https://twitter.com/intent/tweet?url=#">
-            <svg class="fill-current h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-              <path
-                  d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"></path>
-            </svg>
-          </a>
-          <a class="inline-block text-black-300 no-underline hover:text-black-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4 "
-             data-tippy-content="#facebook_id" href="https://www.facebook.com/sharer/sharer.php?u=#">
-            <svg class="fill-current h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-              <path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"></path>
-            </svg>
-          </a>
+  <div class="flex flex-col items-center h-screen md:flex-row">
+    <div class="container mx-auto">
+      <div class="flex justify-center px-2 py-6 ">
+        <div
+            class="flex bg-gradient-to-bl from-start to-end text-white p-6 w-full rounded-lg xl:w-3/4 lg:w-11/12 lg:shadow-xl ">
+          <div class="relative hidden w-full h-auto bg-cover border-r rounded-l-lg bg-blue-1300 lg:block lg:w-6/12 p-4">
+            <div class="">
+              <button @click="openQuizCreateModal($event, $el)"
+                      class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full"
+              >Quiz samenstellen
+              </button>
+            </div>
+          </div>
+          <div class="relative hidden w-full h-auto bg-cover rounded-l-lg bg-blue-1300 lg:block lg:w-6/12 p-4">
+            <button @click="openQuizJoinModal($event, $el)"
+                    class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full">
+              Deelnemen aan een quiz
+            </button>
+          </div>
         </div>
       </div>
     </div>
-
-    <!--Main-->
-    <div class="container pt-24 md:pt-32 px-6 mx-auto flex flex-wrap flex-col md:flex-row items-center">
-
-      <!--Left Col-->
-      <div class="flex flex-col w-full xl:w-2/5 justify-center lg:items-start overflow-y-hidden">
-        <h1 class="my-4 text-3xl md:text-5xl text-black-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1">
-          De slimste mens ter wereld</h1>
-        <p class="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle">Stel hier
-          je quiz samen en speel 'm meteen online!</p>
-        <button @click="openModal($event, $el)"
-                class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full"
-        >Let's go!
-        </button>
-      </div>
-    </div>
-    <modal ref="modalName" @close="clearInputs()">
+    <modal ref="quizCreateModal" @close="clearInputs()">
       <template v-slot:header>
         <label for="game-name">
           <span class="text-3xl font-bold">Hoe noem je je quiz?</span>
@@ -58,18 +38,36 @@
         </form>
       </template>
     </modal>
+    <modal ref="quizJoinModal">
+      <template v-slot:header>
+        <label for="join-code" class="flex flex-col">
+          <span class="text-3xl font-bold">Join code: </span>
+          <span class="leading-relaxed">Deze code moet je krijgen van de quizmaster en is uniek voor iedere quiz.</span>
+        </label>
+      </template>
+      <template v-slot:body>
+        <form @submit="joinGame($event)">
+          <input ref="joinCode" v-model="joinCode" autofocus="autofocus" type="text" id="join-code"
+                 class="px-4 py-2 border-2 border-black rounded w-full">
+          <button type="submit"
+                  class="mt-3 w-full bg-black font-bold text-white text-center rounded py-2 text-uppercase">
+            Let's play!
+          </button>
+        </form>
+      </template>
+    </modal>
   </div>
 </template>
 
 <script>
 import Modal from "../components/Modal";
 import axios from 'axios';
-import Inertia from "@inertiajs/inertia-vue"
 
 export default {
   name: 'App',
   data() {
     return {
+      joinCode: "",
       gameName: ""
     }
   },
@@ -77,14 +75,21 @@ export default {
     clearInputs() {
       this.gameName = "";
     },
-    openModal(e, el) {
+    openQuizJoinModal(e, el){
+      el.blur();
+      this.$refs.quizJoinModal.open();
+      this.$nextTick(() => {
+        this.$refs.joinCode.focus();
+      })
+    },
+    openQuizCreateModal(e, el) {
       el.blur();
 
-      this.$refs.modalName.openModal()
+      this.$refs.quizCreateModal.open()
 
       this.$nextTick(() => {
         this.$refs.gameName.focus();
-      })
+      });
     },
     createGame(e) {
       e.preventDefault();
@@ -95,13 +100,20 @@ export default {
           .then((response) => {
 
             this.gameName = "";
-            this.$refs.modalName.closeModal()
+            this.$refs.quizCreateModal.close()
 
             this.$inertia.visit(response.data.composeuri);
           });
+    },
+    joinGame(e){
+
+      e.preventDefault();
+      this.$inertia.post('/play', {
+        joinCode: this.joinCode
+      })
+
     }
   },
-  created() {},
   components: {
     Modal,
   }

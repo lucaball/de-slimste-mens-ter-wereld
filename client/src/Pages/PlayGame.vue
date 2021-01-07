@@ -4,8 +4,7 @@
       <div class="h-3/5 text-3xl w-full flex items-center justify-center text-center p-4">
         <span class="text-white" v-if="activeQuestion.type === 'text'"> {{ activeQuestion.value }}</span>
         <img class="max-h-full" v-if="activeQuestion.type === 'image'" :src="activeQuestion.value" alt=""/>
-        <video class="max-h-full" :src="activeQuestion.value" ref="video" autoplay
-               v-if="activeQuestion.type === 'video'"/>
+        <video class="max-h-full" :src="activeQuestion.value" ref="video" autoplay v-if="activeQuestion.type === 'video'"/>
       </div>
       <div class="h-2/5 flex w-full flex-wrap items-center text-center">
         <div class="answer text-2xl" :key="answer.id" v-for="answer in activeQuestion.answers">
@@ -18,10 +17,10 @@
       <div class="flex-1" :key="gamePlayer.id" v-for="gamePlayer in players">
         <div class="h-full w-full relative"
              :class="{ 'border-4 border-gradient-tr-main-gradient' : (activePlayer.id === gamePlayer.id ) }">
-          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">{{
-              gamePlayer.seconds
-            }}</span>
-          <video autoplay muted class="h-full w-full object-cover absolute" :ref="gamePlayer.id"></video>
+          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">
+            {{ gamePlayer.seconds }}
+          </span>
+          <PlayerVideo :answerStream="currentStream" :call="gamePlayer.call"></PlayerVideo>
         </div>
       </div>
       <div class="flex-1">
@@ -37,6 +36,7 @@
 import {timer} from "rxjs";
 import {tap} from "rxjs/operators";
 import PlayerVideo from "../components/PlayGame/PlayerVideo";
+import Peer from 'peerjs';
 
 export default {
   name: "PlayGame",
@@ -45,9 +45,10 @@ export default {
     return {
       activePlayer: {},
       activeQuestion: "",
-      peers: {},
       players: [],
       activeIndex: 0,
+      peerID: null,
+      myPeer : null,
       currentStream: null,
     }
   },
@@ -59,26 +60,53 @@ export default {
     }
   },
   mounted() {
-
-    this.$socket.emit('playerJoined', {
-      player: {
-        ...this.player,
-        game: null,
-      },
-      room: this.game.id
+    this.myPeer = new Peer();
+    this.myPeer.on('open', (id) => {
+      console.log(id);
+      this.peerID = id;
     });
 
-    this.players = this.game.gamePlayers;
-    this.players.push(this.player);
-    this.initTicker();
+    this.myPeer.on('call', (call) => {
+      alert('You have been called!');
+      call.answer(this.currentStream)
+      call.on('stream', (stream) => {
+        this.$refs.player_video[0].srcObject = stream
+      })
+    });
 
-    this.currentPlayer = this.game.gamePlayers[0]
 
-    navigator.mediaDevices.getUserMedia({video: true, audio: true})
+    if(!this.isAdmin){
+
+      this.players = this.game.gamePlayers;
+      this.players.push(this.player);
+      this.initTicker();
+
+      this.currentPlayer = this.game.gamePlayers[0]
+    }
+
+    navigator
+        .mediaDevices
+        .getUserMedia({video: true, audio: true})
         .then((stream) => {
+
           this.currentStream = stream;
-          this.$refs[this.player.id][0].srcObject = this.currentStream
-          this.$refs[this.player.id][0].play();
+          this.$socket.emit('playerJoined', {
+            peerID: this.peerID,
+            player: {...this.player, game: null },
+            room: this.game.id
+          });
+
+
+          // let videoRef = null;
+          //
+          // if(this.isAdmin){
+          //   videoRef = this.$refs.adminVideo;
+          // }else{
+          //   // videoRef = this.$refs[this.player.id][0];
+          // }
+          //
+          // videoRef.srcObject = this.currentStream
+          // videoRef.play();
         })
         .catch(error => {
           console.log(error)
@@ -99,7 +127,8 @@ export default {
     this.sockets.subscribe('addSeconds', function (data) {
       this.activePlayer.seconds += data.seconds;
     });
-    this.sockets.subscribe('playerHasJoined', function (data) {
+    this.sockets.subscribe('playerHasJoined', (data) => {
+      data.call = this.myPeer.call(data.peerID, this.currentStream);
       this.players.push(data);
     });
     this.sockets.subscribe('activateUser', function (activePlayer) {
@@ -137,7 +166,8 @@ export default {
   },
   props: {
     player: {},
-    game: {}
+    game: {},
+    isAdmin : false,
   },
 }
 </script>

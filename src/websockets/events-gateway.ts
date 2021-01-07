@@ -26,7 +26,10 @@ export class EventsGateway implements OnGatewayConnection {
 
         socket.on('playerJoined', (data: any) =>{
             socket.join(data.room);
-            socket.broadcast.emit('playerHasJoined', data.player);
+            socket.broadcast.emit('playerHasJoined', {
+                peerID: data.peerID,
+                ... data.player
+            });
         })
     }
 

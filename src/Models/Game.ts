@@ -28,7 +28,7 @@ export class Game extends BaseResource implements ObjectLiteral {
         super();
 
         this.inProgress = false;
-        this.joinCode = "#" + randomString(5);
+        this.joinCode = randomString(8);
         Object.assign(this, partial);
     }
 }

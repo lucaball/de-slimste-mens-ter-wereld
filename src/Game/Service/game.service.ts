@@ -28,7 +28,7 @@ export class GameService {
             .leftJoinAndSelect("rounds.questions", "questions")
             .leftJoinAndSelect("questions.answers", "answers")
             .leftJoinAndSelect("game.gamePlayers", "gamePlayers")
-            .where('joinCode = :joinCode', { joinCode: '#' + joinCode })
+            .where('joinCode = :joinCode', { joinCode: joinCode })
             .orderBy('rounds.position', 'ASC')
             .getOne();
     }

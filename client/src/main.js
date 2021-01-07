@@ -2,6 +2,10 @@ import { App, plugin } from '@inertiajs/inertia-vue'
 import Vue from 'vue'
 
 import VueSocketIO from 'vue-socket.io';
+import VuePeerJS from 'vue-peerjs';
+import Peer from 'peerjs';
+
+// Vue.use(VuePeerJS, new Peer({}));
 Vue.use(new VueSocketIO({
   connection: 'http://localhost:3000/games',
 }))

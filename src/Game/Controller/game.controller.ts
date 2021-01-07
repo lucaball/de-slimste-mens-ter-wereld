@@ -68,15 +68,20 @@ export class GameController {
     ){
         const joinCode = query.j;
         const game = await this.gameService.findForJoinCode(joinCode);
-        const gamePlayer = await this.gamePlayerFactory.createForGame(game);
+        let isAdmin = false;
+
+        if(query.a === '1'){
+            isAdmin = true;
+        }
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         request.Inertia.render({
             component: "PlayGame",
             props : {
-                player: gamePlayer,
-                game: game
+                player: null,
+                game: game,
+                isAdmin: isAdmin
             }
         })
     }

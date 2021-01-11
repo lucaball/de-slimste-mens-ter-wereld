@@ -1,11 +1,26 @@
 <template>
-  <video autoplay class="h-full w-full object-cover absolute" ref="player_video"></video>
+  <video :srcObject.prop="stream"
+         autoplay
+         muted
+         class="h-full w-full object-cover absolute"
+         ref="player_video">
+  </video>
 </template>
 
 <script>
 export default {
   name: "PlayerVideo",
+  data(){
+    return {
+      stream: null,
+    }
+  },
   methods : {
+    setupStream(){
+      if(this.ownStream !== null){
+        this.stream = this.ownStream;
+      }
+    },
     setupCall(){
 
       if(this.call === undefined){
@@ -13,20 +28,23 @@ export default {
       }
 
       this.call.on('stream',(stream) => {
-        console.log(stream);
-        const newVid = this.$refs.player_video;
-        newVid.srcObject = stream;
-        newVid.playsinline = false
-        newVid.autoplay = true
-        newVid.className = "vid"
+        this.stream = stream;
       });
     }
   },
   mounted() {
     this.setupCall();
+    this.setupStream();
+  },
+  watch : {
+    ownStream : function(newVal) {
+      console.log('HALOOO');
+      this.stream = newVal
+    }
   },
   props: {
-    call: null
+    ownStream: null,
+    call: null,
   }
 }
 </script>

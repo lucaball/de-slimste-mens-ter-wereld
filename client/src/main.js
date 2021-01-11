@@ -7,7 +7,7 @@ import Peer from 'peerjs';
 
 // Vue.use(VuePeerJS, new Peer({}));
 Vue.use(new VueSocketIO({
-  connection: 'http://localhost:3000/games',
+  connection: 'https://9270775bcbc6.ngrok.io/games',
 }))
 
 Vue.config.productionTip = false

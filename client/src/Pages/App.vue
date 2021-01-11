@@ -20,6 +20,10 @@
           </div>
         </div>
       </div>
+      <button @click="openQuizJoinModal($event, $el)"
+              class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full">
+        Deelnemen aan een quiz
+      </button>
     </div>
     <modal ref="quizCreateModal" @close="clearInputs()">
       <template v-slot:header>

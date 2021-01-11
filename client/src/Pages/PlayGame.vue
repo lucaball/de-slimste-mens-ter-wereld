@@ -20,7 +20,7 @@
           <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">
             {{ gamePlayer.seconds }}
           </span>
-          <PlayerVideo :answerStream="currentStream" :call="gamePlayer.call"></PlayerVideo>
+          <PlayerVideo :own-stream="gamePlayer.playerStream" :call="gamePlayer.call"/>
         </div>
       </div>
       <div class="flex-1">
@@ -48,7 +48,7 @@ export default {
       players: [],
       activeIndex: 0,
       peerID: null,
-      myPeer : null,
+      myPeer : new Peer(this.player.id),
       currentStream: null,
     }
   },
@@ -60,25 +60,14 @@ export default {
     }
   },
   mounted() {
-    this.myPeer = new Peer();
+
     this.myPeer.on('open', (id) => {
-      console.log(id);
       this.peerID = id;
     });
-
-    this.myPeer.on('call', (call) => {
-      alert('You have been called!');
-      call.answer(this.currentStream)
-      call.on('stream', (stream) => {
-        this.$refs.player_video[0].srcObject = stream
-      })
-    });
-
 
     if(!this.isAdmin){
 
       this.players = this.game.gamePlayers;
-      this.players.push(this.player);
       this.initTicker();
 
       this.currentPlayer = this.game.gamePlayers[0]
@@ -96,26 +85,27 @@ export default {
             room: this.game.id
           });
 
+          this.player.playerStream = stream;
+          this.players.push(this.player);
 
-          // let videoRef = null;
-          //
-          // if(this.isAdmin){
-          //   videoRef = this.$refs.adminVideo;
-          // }else{
-          //   // videoRef = this.$refs[this.player.id][0];
-          // }
-          //
-          // videoRef.srcObject = this.currentStream
-          // videoRef.play();
+          this.myPeer.on('call', (call) => {
+            call.answer(this.currentStream);
+
+            const callingPlayerIndex = this.players.findIndex((player) => player.id === call.peer);
+
+            call.on('stream', (stream) => {
+              console.log("ANSWER STREAM");
+              this.$set(this.players[callingPlayerIndex], 'playerStream', stream)
+            })
+          });
         })
-        .catch(error => {
-          console.log(error)
-        })
+        .catch()
     ;
 
     this.sockets.subscribe('setQuestion', function (data) {
       this.activeQuestion = data;
     });
+
     this.sockets.subscribe('showAnswer', function (data) {
 
       const answerToShow = this.activeQuestion.answers.find((answer) => {
@@ -128,7 +118,11 @@ export default {
       this.activePlayer.seconds += data.seconds;
     });
     this.sockets.subscribe('playerHasJoined', (data) => {
-      data.call = this.myPeer.call(data.peerID, this.currentStream);
+
+      data.call = this.myPeer.call(data.peerID, this.currentStream, {
+        playerId: this.player.id
+      });
+
       this.players.push(data);
     });
     this.sockets.subscribe('activateUser', function (activePlayer) {

@@ -28,7 +28,7 @@ Encore
     .addEntry('main', './src/main.js')
     .addStyleEntry('style', './css/tailwind.css')
     .enableSassLoader()
-    .enableVueLoader()
+    .enableVueLoader(() => {}, { runtimeCompilerBuild: false })
         //.addEntry('page1', './assets/page1.js')
     //.addEntry('page2', './assets/page2.js')
 
@@ -50,7 +50,7 @@ Encore
     .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
     // enables hashed filenames (e.g. app.abc123.css)
-    .enableVersioning(Encore.isProduction())
+    // .enableVersioning(Encore.isProduction())
 
     // enables @babel/preset-env polyfills
     // .configureBabelPresetEnv((config) => {

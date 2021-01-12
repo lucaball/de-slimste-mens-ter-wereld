@@ -7,7 +7,6 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {GameRoundService} from "../../GameRound/Service/game-round.service";
 import {GamePlayerFactory} from "../../GamePlayer/Factory/GamePlayerFactory";
-import {EventsGateway} from "../../../dist/events-gateway";
 
 @Controller()
 export class GameController {
@@ -20,8 +19,7 @@ export class GameController {
         private gameFactory: GameFactory,
         private gameService: GameService,
         private gameRoundService: GameRoundService,
-        private gamePlayerFactory: GamePlayerFactory,
-        private eventGateway : EventsGateway
+        private gamePlayerFactory: GamePlayerFactory
     ) {
     }
 

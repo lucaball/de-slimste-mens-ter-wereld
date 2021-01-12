@@ -9,7 +9,7 @@
       "sync": "typeorm schema:sync",
       "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
       "prebuild": "rimraf dist",
-      "build": "nest build",
+      "build": "cd client && yarn encore prod && cd .. && nest build",
       "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
       "start": "ts-node src/index.ts",
       "start:dev": "nest start --watch",

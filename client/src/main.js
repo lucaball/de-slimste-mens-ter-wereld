@@ -2,12 +2,8 @@ import { App, plugin } from '@inertiajs/inertia-vue'
 import Vue from 'vue'
 
 import VueSocketIO from 'vue-socket.io';
-import VuePeerJS from 'vue-peerjs';
-import Peer from 'peerjs';
-
-// Vue.use(VuePeerJS, new Peer({}));
 Vue.use(new VueSocketIO({
-  connection: 'https://9270775bcbc6.ngrok.io/games',
+  connection: 'https://188b0fe45b67.ngrok.io/games',
 }))
 
 Vue.config.productionTip = false

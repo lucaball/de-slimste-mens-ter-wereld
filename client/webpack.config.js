@@ -60,11 +60,9 @@ Encore
 
 // enables Sass/SCSS support
 //.enableSassLoader()
-    .addPlugin(new CopyPlugin({
-        patterns: [
-            {from: './src/assets/fonts', to: 'fonts'}
-        ]
-    }))
+    .addPlugin(new CopyPlugin([
+        {from: './src/assets/fonts', to: 'fonts'}
+    ]))
 // uncomment if you use TypeScript
 //.enableTypeScriptLoader()
 

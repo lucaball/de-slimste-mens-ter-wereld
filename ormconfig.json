@@ -1,8 +1,8 @@
 {
-  "type": "mysql",
+  "type": "postgres",
   "host": "127.0.0.1",
-  "port": 3307,
-  "username": "dsmtw_user",
+  "port": 5432,
+  "username": "dsmtw",
   "password": "dsmtw_pass",
   "database": "dsmtw",
   "entities": ["dist/Models/**/*{.ts,.js}"],

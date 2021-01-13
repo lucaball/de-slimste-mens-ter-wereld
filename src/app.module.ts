@@ -23,14 +23,17 @@ import {Video} from "./Models/Video";
 import {GamePlayer} from "./Models/GamePlayer";
 import { WebsocketsModule } from './websockets/websockets.module';
 import {GamePlayerFactory} from "./GamePlayer/Factory/GamePlayerFactory";
+import { DatabaseModule } from './database/database.module';
+import {ConfigModule} from "@nestjs/config";
 
 @Module({
     imports: [
+        ConfigModule.forRoot(),
         ServeStaticModule.forRoot({
             rootPath: join(__dirname, '..', 'client/public'),
         }),
         MulterModule,
-        TypeOrmModule.forRoot({}),
+        DatabaseModule.forRoot(),
         TypeOrmModule.forFeature([Game, GameRound, Question, Answer, Image, Video, GamePlayer]),
         WebsocketsModule,
     ],

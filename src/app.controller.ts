@@ -32,15 +32,4 @@ export class AppController {
           props: { games: games }
       });
     }
-
-    @Get("/tiens")
-    async noize(@Request() request: Request){
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        request.Inertia.render({
-            component: "HelloWorld",
-            props: { msg: "NOIZE" }
-        });
-    }
 }

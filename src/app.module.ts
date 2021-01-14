@@ -50,8 +50,6 @@ export class AppModule implements NestModule {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-            <script src="/runtime.js" defer></script>
-            <script src="/0.js" defer></script>
             <script src="/main.js" defer></script>
             <link rel="stylesheet" href="/main.css">
             <link rel="stylesheet" href="/style.css">

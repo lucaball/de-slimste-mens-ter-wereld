@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 rounded bg-gray-200 mb-4">
+  <div class="p-4 rounded bg-gray-200 mb-4 bg-gradient-to-bl from-start to-end text-white">
     <div class="flex justify-between">
       <div>
         <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'text') }" @click="question.type = 'text'">

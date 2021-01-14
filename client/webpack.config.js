@@ -33,11 +33,11 @@ Encore
     //.addEntry('page2', './assets/page2.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
-    .splitEntryChunks()
+    // .splitEntryChunks()
 
     // will require an extra script tag for runtime.js
     // but, you probably want this, unless you're building a single-page app
-    .enableSingleRuntimeChunk()
+    // .enableSingleRuntimeChunk()
 
     /*
      * FEATURE CONFIG
@@ -48,9 +48,9 @@ Encore
      */
     .cleanupOutputBeforeBuild()
     .enableBuildNotifications()
-    .enableSourceMaps(!Encore.isProduction())
+    .enableSourceMaps(false)
     // enables hashed filenames (e.g. app.abc123.css)
-    // .enableVersioning(Encore.isProduction())
+    .enableVersioning(false)
 
     // enables @babel/preset-env polyfills
     // .configureBabelPresetEnv((config) => {

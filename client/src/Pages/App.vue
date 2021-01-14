@@ -20,10 +20,6 @@
           </div>
         </div>
       </div>
-      <button @click="openQuizJoinModal($event, $el)"
-              class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full">
-        Deelnemen aan een quiz
-      </button>
     </div>
     <modal ref="quizCreateModal" @close="clearInputs()">
       <template v-slot:header>
@@ -35,8 +31,9 @@
         <form @submit="createGame($event)">
           <input ref="gameName" v-model="gameName" autofocus="autofocus" type="text" id="game-name"
                  class="px-4 py-2 border-2 border-black rounded w-full">
-          <button type="submit"
-                  class="mt-3 w-full bg-black font-bold text-white text-center rounded py-2 text-uppercase">
+          <button
+              type="submit"
+              class="mt-3 w-full bg-gradient-to-bl from-start to-end text-white text-center rounded py-2 text-uppercase">
             GO!
           </button>
         </form>
@@ -54,7 +51,7 @@
           <input ref="joinCode" v-model="joinCode" autofocus="autofocus" type="text" id="join-code"
                  class="px-4 py-2 border-2 border-black rounded w-full">
           <button type="submit"
-                  class="mt-3 w-full bg-black font-bold text-white text-center rounded py-2 text-uppercase">
+                  class="mt-3 w-full bg-gradient-to-bl from-start to-end text-white text-center rounded py-2 text-uppercase">
             Let's play!
           </button>
         </form>

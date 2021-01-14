@@ -29,7 +29,7 @@
           Start het spel, deel onderstaande joincode met de deelnemers.
         </template>
         <template v-slot:body class="flex flex-col">
-          {{ game.joinCode }}
+          <h5 class="text-3xl py-4 text-center">{{ game.joinCode }}</h5>
           <span class="my-2">
             Als quizmaster kun je de quiz beheren via deze URL.
             Je opent die best op een apart scherm of tablet.

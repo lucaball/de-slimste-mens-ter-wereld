@@ -4,7 +4,6 @@ import {AppService} from './app.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Game} from "./Models/Game";
 import {GameRound} from "./Models/GameRound";
-import * as inertia from 'inertia-node/src';
 import {GameController} from "./Game/Controller/game.controller";
 import {GameFactory} from "./Game/Factory/GameFactory";
 import {GameService} from "./Game/Service/game.service";
@@ -25,6 +24,7 @@ import { WebsocketsModule } from './websockets/websockets.module';
 import {GamePlayerFactory} from "./GamePlayer/Factory/GamePlayerFactory";
 import { DatabaseModule } from './database/database.module';
 import {ConfigModule} from "@nestjs/config";
+import {InertiaMiddleware} from "./Middleware/inertia.middleware";
 
 @Module({
     imports: [
@@ -40,34 +40,8 @@ import {ConfigModule} from "@nestjs/config";
     controllers: [AppController, GameController, QuestionController, AnswerController, FileController],
     providers: [AppService, GameFactory, GameService, GameRoundService, QuestionFactory, GamePlayerFactory],
 })
-
 export class AppModule implements NestModule {
-
-    public ASSET_VERSION = "1";
-    public html = (page, viewData) => `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-            <script src="/main.js" defer></script>
-            <link rel="stylesheet" href="/main.css">
-            <link rel="stylesheet" href="/style.css">
-            
-        <!-- Custom data -->
-        <title>${viewData.title}</title>
-      </head>
-        <script>
-        console.log(${JSON.stringify(page)})
-        </script>
-      <!-- The Inertia page object -->
-      <body>
-        <div  id="app" data-page='${JSON.stringify(page)}'></div>
-        </body>
-    </html>
-    `;
-
     configure(consumer: MiddlewareConsumer): any {
-        consumer.apply(inertia(this.html, this.ASSET_VERSION)).forRoutes('*')
+        consumer.apply(InertiaMiddleware).forRoutes('*')
     }
 }

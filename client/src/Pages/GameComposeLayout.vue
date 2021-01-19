@@ -35,7 +35,9 @@
             Je opent die best op een apart scherm of tablet.
           </span>
           <span class="my-2">
-            https://localhost:3000/play
+            <a :href="'/game/' + game.id + '/play'">
+              /game/{{ game.id }}/play
+            </a>
           </span>
           <span class="my-2">
             Op het speelscherm zie je hetzelfde als als de medespelers

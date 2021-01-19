@@ -1,24 +1,17 @@
 <template>
-  <div class="flex flex-col items-center h-screen md:flex-row">
-    <div class="container mx-auto">
-      <div class="flex justify-center px-2 py-6 ">
-        <div
-            class="flex bg-gradient-to-bl from-start to-end text-white p-6 w-full rounded-lg xl:w-3/4 lg:w-11/12 lg:shadow-xl ">
-          <div class="relative hidden w-full h-auto bg-cover border-r rounded-l-lg bg-blue-1300 lg:block lg:w-6/12 p-4">
-            <div class="">
-              <button @click="openQuizCreateModal($event, $el)"
-                      class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full"
-              >Quiz samenstellen
-              </button>
-            </div>
-          </div>
-          <div class="relative hidden w-full h-auto bg-cover rounded-l-lg bg-blue-1300 lg:block lg:w-6/12 p-4">
-            <button @click="openQuizJoinModal($event, $el)"
-                    class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full">
-              Deelnemen aan een quiz
-            </button>
-          </div>
-        </div>
+  <div class="flex flex-row items-center h-screen">
+    <div class="h-screen/4 container mx-auto flex md:flex-row flex-col justify-center px-2 py-6 bg-gradient-to-bl from-start to-end text-white rounded-xl shadow-sm">
+      <div class="md:border-r w-full md:w-6/12 p-4 flex flex-row items-center">
+          <button @click="openQuizCreateModal($event, $el)"
+                  class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full">
+            Quiz samenstellen
+          </button>
+      </div>
+      <div class="w-full md:w-6/12 p-4 flex flex-row items-center">
+        <button @click="openQuizJoinModal($event, $el)"
+                class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full">
+          Deelnemen aan een quiz
+        </button>
       </div>
     </div>
     <modal ref="quizCreateModal" @close="clearInputs()">
@@ -76,7 +69,7 @@ export default {
     clearInputs() {
       this.gameName = "";
     },
-    openQuizJoinModal(e, el){
+    openQuizJoinModal(e, el) {
       el.blur();
       this.$refs.quizJoinModal.open();
       this.$nextTick(() => {
@@ -106,7 +99,7 @@ export default {
             this.$inertia.visit(response.data.composeuri);
           });
     },
-    joinGame(e){
+    joinGame(e) {
 
       e.preventDefault();
       this.$inertia.post('/play', {

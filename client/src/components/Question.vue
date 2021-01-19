@@ -1,6 +1,6 @@
 <template>
-  <div class="p-4 rounded bg-gray-200 mb-4 bg-gradient-to-bl from-start to-end text-white">
-    <div class="flex justify-between">
+  <div class="p-4 rounded bg-gray-200 mb-4 bg-gradient-to-bl from-start to-end">
+    <div class="flex justify-between text-white">
       <div>
         <button class="pr-2 pb-2 text-gray-500 hover:text-black" :class="{ 'text-gray-900' : (question.type === 'text') }" @click="question.type = 'text'">
           <TextIcon :size=20></TextIcon>
@@ -22,7 +22,7 @@
     <ImageType :question="question" @input="saveQuestion()"></ImageType>
     <VideoType :question="question" @input="saveQuestion()"></VideoType>
 
-    <a aria-label="button" class="mt-2 hover:underline cursor-pointer" @click="$emit('editanswers', question)">
+    <a aria-label="button" class="text-white mt-4 hover:underline cursor-pointer" @click="$emit('editanswers', question)">
       Antwoorden bewerken
     </a>
   </div>

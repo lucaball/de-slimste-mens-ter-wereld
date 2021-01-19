@@ -1,7 +1,6 @@
 <template>
   <video :srcObject.prop="stream"
          autoplay
-         muted
          class="h-full w-full object-cover absolute"
          ref="player_video">
   </video>
@@ -12,12 +11,14 @@ export default {
   name: "PlayerVideo",
   data(){
     return {
+      muted: false,
       stream: null,
     }
   },
   methods : {
     setupStream(){
       if(this.ownStream !== null){
+        this.$refs.player_video.muted = true;
         this.stream = this.ownStream;
       }
     },

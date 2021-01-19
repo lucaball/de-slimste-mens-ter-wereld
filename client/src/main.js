@@ -3,7 +3,7 @@ import Vue from 'vue'
 
 import VueSocketIO from 'vue-socket.io';
 Vue.use(new VueSocketIO({
-  connection: 'https://dsmtw-be.herokuapp.com/games',
+  connection: '/games',
 }))
 
 Vue.config.productionTip = false

@@ -1,6 +1,6 @@
 <template>
   <div v-if="question.type === 'text'">
-    <input v-model="question.value" class="rounded w-full p-2" type="text" @change="$emit('input', question.value)">
+    <input v-model="question.value" class="rounded w-full p-2 text-black" type="text" @change="$emit('input', question.value)">
   </div>
 </template>
 

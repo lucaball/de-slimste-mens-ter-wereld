@@ -48,7 +48,7 @@ export default {
       players: [],
       activeIndex: 0,
       peerID: null,
-      myPeer : new Peer(this.player.id),
+      myPeer : new Peer(this.playerIdentifier),
       currentStream: null,
     }
   },
@@ -79,14 +79,17 @@ export default {
         .then((stream) => {
 
           this.currentStream = stream;
-          this.$socket.emit('playerJoined', {
-            peerID: this.peerID,
-            player: {...this.player, game: null },
-            room: this.game.id
-          });
 
-          this.player.playerStream = stream;
-          this.players.push(this.player);
+          if(!this.isAdmin){
+            this.$socket.emit('playerJoined', {
+              peerID: this.peerID,
+              player: {...this.player, game: null },
+              room: this.game.id
+            });
+
+            this.player.playerStream = stream;
+            this.players.push(this.player);
+          }
 
           this.myPeer.on('call', (call) => {
             call.answer(this.currentStream);
@@ -94,7 +97,6 @@ export default {
             const callingPlayerIndex = this.players.findIndex((player) => player.id === call.peer);
 
             call.on('stream', (stream) => {
-              console.log("ANSWER STREAM");
               this.$set(this.players[callingPlayerIndex], 'playerStream', stream)
             })
           });
@@ -119,9 +121,7 @@ export default {
     });
     this.sockets.subscribe('playerHasJoined', (data) => {
 
-      data.call = this.myPeer.call(data.peerID, this.currentStream, {
-        playerId: this.player.id
-      });
+      data.call = this.myPeer.call(data.peerID, this.currentStream);
 
       this.players.push(data);
     });
@@ -132,7 +132,6 @@ export default {
     this.sockets.subscribe('stopTicking', () => this.stopTicking());
     this.sockets.subscribe('stopTicking', () => this.stopTicking());
   },
-
   methods: {
     initTicker() {
       this.ticker = timer(1000, 1000).pipe(tap());
@@ -162,6 +161,17 @@ export default {
     player: {},
     game: {},
     isAdmin : false,
+  },
+  computed : {
+
+    playerIdentifier(){
+
+      if(this.isAdmin){
+        return 'admin_'.this.game.id
+      }
+
+      return this.player.id;
+    }
   },
 }
 </script>

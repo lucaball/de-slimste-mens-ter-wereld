@@ -25,10 +25,10 @@ Encore
      * Each entry will result in one JavaScript file (e.g. app.js)
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
-    .addEntry('main', './src/main.js')
-    .addStyleEntry('style', './css/tailwind.css')
+    .addEntry('main', './assets/js/app.js')
+    .addStyleEntry('style', './assets/css/tailwind.css')
     .enableSassLoader()
-    .enableVueLoader(() => {}, { runtimeCompilerBuild: false })
+    .enableVueLoader(() => {}, { runtimeCompilerBuild: true })
         //.addEntry('page1', './assets/page1.js')
     //.addEntry('page2', './assets/page2.js')
 
@@ -47,6 +47,7 @@ Encore
      * https://symfony.com/doc/current/frontend.html#adding-more-features
      */
     .cleanupOutputBeforeBuild()
+    .disableSingleRuntimeChunk()
     .enableBuildNotifications()
     .enableSourceMaps(false)
     // enables hashed filenames (e.g. app.abc123.css)
@@ -59,10 +60,12 @@ Encore
     // })
 
 // enables Sass/SCSS support
-//.enableSassLoader()
-    .addPlugin(new CopyPlugin([
-        {from: './src/assets/fonts', to: 'fonts'}
-    ]))
+.enableSassLoader()
+    .addPlugin(new CopyPlugin({
+        patterns : [
+            {from: './assets/fonts', to: 'fonts'}
+        ]
+    }))
 // uncomment if you use TypeScript
 //.enableTypeScriptLoader()
 

@@ -4,7 +4,7 @@ import Vue from 'vue'
 import VueSocketIO from 'vue-socket.io';
 Vue.use(new VueSocketIO({
   connection: '/games',
-}))
+}));
 
 Vue.config.productionTip = false
 Vue.use(plugin)

@@ -8,7 +8,18 @@ async function bootstrap() {
 
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-    app.useStaticAssets(join(__dirname, '..', 'client/public/build'));
+    app.useStaticAssets(join(__dirname, '..', 'public/build'));
+    app.setBaseViewsDir(join(__dirname, '..', 'views'));
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    app.setViewEngine({
+        engine: {
+            handlebars: require('handlebars'),
+        },
+        templates: join(__dirname, '..', 'views'),
+    });
+
     await app.listen(process.env.PORT || 8080);
 
     Logger.verbose("App running on " + await app.getUrl());

@@ -29,9 +29,9 @@ import {ConfigModule} from "@nestjs/config";
 @Module({
     imports: [
         ConfigModule.forRoot(),
-        ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', 'client/public'),
-        }),
+        // ServeStaticModule.forRoot({
+        //     rootPath: join(__dirname, '..', 'public'),
+        // }),
         MulterModule,
         DatabaseModule.forRoot(),
         TypeOrmModule.forFeature([Game, GameRound, Question, Answer, Image, Video, GamePlayer]),

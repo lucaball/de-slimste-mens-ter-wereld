@@ -8,6 +8,11 @@ export function getOrmConfig(): TypeOrmModuleOptions {
         entities: ["dist/Models/**/*{.ts,.js}"],
         synchronize: true,
         logging: true,
+        "extra": {
+            "ssl": {
+                "rejectUnauthorized": false
+            }
+        }
     };
 }
 

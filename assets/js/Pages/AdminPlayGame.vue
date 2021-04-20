@@ -76,6 +76,8 @@
 </template>
 
 <script>
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 import {timer} from "rxjs";
 import {tap} from "rxjs/operators";
 

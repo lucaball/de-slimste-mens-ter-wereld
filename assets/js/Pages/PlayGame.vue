@@ -4,7 +4,8 @@
       <div class="h-3/5 text-3xl w-full flex items-center justify-center text-center p-4">
         <span class="text-white" v-if="activeQuestion.type === 'text'"> {{ activeQuestion.value }}</span>
         <img class="max-h-full" v-if="activeQuestion.type === 'image'" :src="activeQuestion.value" alt=""/>
-        <video class="max-h-full" :src="activeQuestion.value" ref="video" autoplay v-if="activeQuestion.type === 'video'"/>
+        <video class="max-h-full" :src="activeQuestion.value" ref="video" autoplay
+               v-if="activeQuestion.type === 'video'"/>
       </div>
       <div class="h-2/5 flex w-full flex-wrap items-center text-center">
         <div class="answer text-2xl" :key="answer.id" v-for="answer in activeQuestion.answers">
@@ -22,10 +23,10 @@
           </span>
           <PlayerVideo :own-stream="gamePlayer.playerStream" :call="gamePlayer.call"/>
         </div>
-      </div>
-      <div class="flex-1">
-        <div class="h-full w-full rounded bg-gray-400 flex justify-center items-center relative">
-          <video muted autoplay class="h-full w-full object-cover absolute" id="local-video" ref="adminVideo"></video>
+        <div class="flex-1">
+          <div class="h-full w-full rounded bg-gray-400 flex justify-center items-center relative">
+            <PlayerVideo :own-stream="gamePlayer.playerStream" :call="gamePlayer.call"/>
+          </div>
         </div>
       </div>
     </div>
@@ -48,7 +49,7 @@ export default {
       players: [],
       activeIndex: 0,
       peerID: null,
-      myPeer : new Peer(this.playerIdentifier),
+      myPeer: new Peer(this.playerIdentifier),
       currentStream: null,
     }
   },
@@ -65,7 +66,7 @@ export default {
       this.peerID = id;
     });
 
-    if(!this.isAdmin){
+    if (!this.isAdmin) {
 
       this.players = this.game.gamePlayers;
       this.initTicker();
@@ -80,10 +81,11 @@ export default {
 
           this.currentStream = stream;
 
-          if(!this.isAdmin){
+          if (!this.isAdmin) {
+
             this.$socket.emit('playerJoined', {
               peerID: this.peerID,
-              player: {...this.player, game: null },
+              player: {...this.player, game: null},
               room: this.game.id
             });
 
@@ -107,7 +109,6 @@ export default {
     this.sockets.subscribe('setQuestion', function (data) {
       this.activeQuestion = data;
     });
-
     this.sockets.subscribe('showAnswer', function (data) {
 
       const answerToShow = this.activeQuestion.answers.find((answer) => {
@@ -160,13 +161,13 @@ export default {
   props: {
     player: {},
     game: {},
-    isAdmin : false,
+    isAdmin: false,
   },
-  computed : {
+  computed: {
 
-    playerIdentifier(){
+    playerIdentifier() {
 
-      if(this.isAdmin){
+      if (this.isAdmin) {
         return 'admin_'.this.game.id
       }
 

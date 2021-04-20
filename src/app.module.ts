@@ -51,8 +51,12 @@ export class AppModule implements NestModule {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
             <script src="main.js" defer></script>
-            <link rel="stylesheet" href="style.css">
-            <link rel="stylesheet" href="main.css">
+            <link rel="stylesheet" href="/style.css">
+            <link rel="stylesheet" href="/main.css">
+            <script src="/runtime.js" defer></script>
+            <script src="/vendors~main.js" defer></script>
+            <script src="/main.js" defer></script>
+            <link rel="stylesheet" href="/main.css">
             
         <!-- Custom data -->
         <title>${viewData.title}</title>

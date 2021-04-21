@@ -39,6 +39,9 @@ import {tap} from "rxjs/operators";
 import PlayerVideo from "../components/PlayGame/PlayerVideo";
 import Peer from 'peerjs';
 
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 export default {
   name: "PlayGame",
   components: {PlayerVideo},
@@ -49,7 +52,7 @@ export default {
       players: [],
       activeIndex: 0,
       peerID: null,
-      myPeer: new Peer(this.playerIdentifier),
+      myPeer: {},
       currentStream: null,
     }
   },
@@ -61,6 +64,8 @@ export default {
     }
   },
   mounted() {
+
+    this.myPeer = new Peer(this.playerIdentifier);
 
     this.myPeer.on('open', (id) => {
       this.peerID = id;
@@ -95,9 +100,7 @@ export default {
 
           this.myPeer.on('call', (call) => {
             call.answer(this.currentStream);
-
             const callingPlayerIndex = this.players.findIndex((player) => player.id === call.peer);
-
             call.on('stream', (stream) => {
               this.$set(this.players[callingPlayerIndex], 'playerStream', stream)
             })

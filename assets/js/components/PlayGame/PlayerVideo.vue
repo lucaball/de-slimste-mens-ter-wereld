@@ -18,8 +18,9 @@ export default {
   methods : {
     setupStream(){
       if(this.ownStream !== null){
-        this.$refs.player_video.muted = true;
         this.stream = this.ownStream;
+      }else{
+        this.$refs.player_video.muted = true;
       }
     },
     setupCall(){
@@ -39,7 +40,6 @@ export default {
   },
   watch : {
     ownStream : function(newVal) {
-      console.log('HALOOO');
       this.stream = newVal
     }
   },

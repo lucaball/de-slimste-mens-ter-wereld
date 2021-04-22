@@ -26,15 +26,10 @@
       </div>
       <div class="flex-1">
         <div class="h-full w-full relative">
-          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">
-
-          </span>
+          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds"></span>
           <PlayerVideo :own-stream="adminStream"/>
         </div>
       </div>
-<!--      <div class="flex-1">-->
-<!--        <PlayerVideo :own-stream="adminStream"/>-->
-<!--      </div>-->
     </div>
   </div>
 </template>
@@ -53,14 +48,14 @@ export default {
   components: {PlayerVideo},
   data() {
     return {
-      adminStream : null,
       activePlayer: {},
       activeQuestion: "",
       players: [],
       activeIndex: 0,
       peerID: null,
       myPeer: {},
-      currentStream: null,
+      adminStream: null,
+      myOwnStream: null,
     }
   },
   watch: {
@@ -73,64 +68,59 @@ export default {
   mounted() {
 
     this.myPeer = new Peer(this.playerIdentifier);
-
     this.myPeer.on('open', (id) => {
-      this.peerID = id;
+
+      this.peerID = id
+
+      // Let other players know I joined! They can have my peerID.
+      // But I'm lazy. So they will have to call me. Also because I don't know their number.
+      this.$socket.emit('playerJoined', {
+        peerID: this.peerID,
+        player: {...this.player, game: null},
+        room: this.game.id
+      })
     });
 
-    if (!this.isAdmin) {
-
-      this.players = this.game.gamePlayers;
-      this.initTicker();
-
-      this.currentPlayer = this.game.gamePlayers[0]
-    }
+    this.players = this.game.gamePlayers;
+    this.initTicker();
 
     navigator
         .mediaDevices
         .getUserMedia({video: true, audio: true})
         .then((stream) => {
 
-          this.currentStream = stream;
+          this.myOwnStream = stream;
 
           if (!this.isAdmin) {
-
-            this.$socket.emit('playerJoined', {
-              peerID: this.peerID,
-              player: {...this.player, game: null},
-              room: this.game.id
-            });
-
-            this.player.playerStream = stream;
+            this.player.playerStream = this.myOwnStream;
             this.players.push(this.player);
-          }else{
-
-            this.$socket.emit('playerJoined', {
-              peerID: this.peerID,
-              player: null,
-              room: this.game.id
-            });
-
-            this.adminStream = stream;
+          } else {
+            this.adminStream = this.myOwnStream;
           }
-
-          this.myPeer.on('call', (call) => {
-            call.answer(this.currentStream);
-            const callingPlayerIndex = this.players.findIndex((player) => player.id === call.peer);
-
-            call.on('stream', (stream) => {
-
-              if(call.peer === 'admin'){
-                this.adminStream = stream;
-                return;
-              }
-
-              this.$set(this.players[callingPlayerIndex], 'playerStream', stream)
-            })
-          });
         })
         .catch()
     ;
+
+    // Because I'm a modern bwoi, I even have my own phone. So if people want, they can call me.
+    this.myPeer.on('call', (call) => {
+
+      // WAZZZAAAAAAAPPPPP, WHO'S CALLLIIINGGG??
+      const callingPlayerIndex = this.players.findIndex((player) => player.id === call.peer);
+
+      call.on('stream', (stream) => {
+        // WAZZAAAAAAAAPPPP
+        if (call.peer === "admin") {
+          // Uh-Oh, the caller is the admin :o
+          // Give that fancy dude its own stream.
+          this.adminStream = stream;
+        } else {
+          this.$set(this.players[callingPlayerIndex], 'playerStream', stream)
+        }
+      })
+
+      // Oh, before I forget. Here's my own face. In case you need it.
+      call.answer(this.myOwnStream);
+    })
 
     this.sockets.subscribe('setQuestion', function (data) {
       this.activeQuestion = data;
@@ -146,12 +136,20 @@ export default {
     this.sockets.subscribe('addSeconds', function (data) {
       this.activePlayer.seconds += data.seconds;
     });
+
+    // Oi, look, an other player joined.
     this.sockets.subscribe('playerHasJoined', (data) => {
 
-      data.call = this.myPeer.call(data.peerID, this.currentStream);
+      // Oh, I received its data, containing his peerID
+      // Let me call him wih my own stream of data. You know, probably my own ugly head.
+      data.call = this.myPeer.call(data.peerID, this.myOwnStream);
 
-      this.players.push(data);
+      // Oh, because I want to see your ugly head. I want to save our call.
+      if (data.peerID !== "admin") {
+        this.players.push(data);
+      }
     });
+
     this.sockets.subscribe('activateUser', function (activePlayer) {
       this.activePlayer = this.game.gamePlayers.find((gamePlayer) => gamePlayer.id === activePlayer.player.id)
     })

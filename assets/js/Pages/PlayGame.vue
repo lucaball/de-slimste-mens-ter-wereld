@@ -23,12 +23,18 @@
           </span>
           <PlayerVideo :own-stream="gamePlayer.playerStream" :call="gamePlayer.call"/>
         </div>
-        <div class="flex-1">
-          <div class="h-full w-full rounded bg-gray-400 flex justify-center items-center relative">
-            <PlayerVideo :own-stream="gamePlayer.playerStream" :call="gamePlayer.call"/>
-          </div>
+      </div>
+      <div class="flex-1">
+        <div class="h-full w-full relative">
+          <span class="text-white text-center bg-gradient-to-bl from-start to-end player-seconds">
+
+          </span>
+          <PlayerVideo :own-stream="adminStream"/>
         </div>
       </div>
+<!--      <div class="flex-1">-->
+<!--        <PlayerVideo :own-stream="adminStream"/>-->
+<!--      </div>-->
     </div>
   </div>
 </template>
@@ -47,6 +53,7 @@ export default {
   components: {PlayerVideo},
   data() {
     return {
+      adminStream : null,
       activePlayer: {},
       activeQuestion: "",
       players: [],
@@ -96,12 +103,28 @@ export default {
 
             this.player.playerStream = stream;
             this.players.push(this.player);
+          }else{
+
+            this.$socket.emit('playerJoined', {
+              peerID: this.peerID,
+              player: null,
+              room: this.game.id
+            });
+
+            this.adminStream = stream;
           }
 
           this.myPeer.on('call', (call) => {
             call.answer(this.currentStream);
             const callingPlayerIndex = this.players.findIndex((player) => player.id === call.peer);
+
             call.on('stream', (stream) => {
+
+              if(call.peer === 'admin'){
+                this.adminStream = stream;
+                return;
+              }
+
               this.$set(this.players[callingPlayerIndex], 'playerStream', stream)
             })
           });
@@ -171,7 +194,7 @@ export default {
     playerIdentifier() {
 
       if (this.isAdmin) {
-        return 'admin_'.this.game.id
+        return 'admin'
       }
 
       return this.player.id;

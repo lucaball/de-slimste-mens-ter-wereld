@@ -1,19 +1,31 @@
 <template>
-  <div class="flex flex-row items-center h-screen">
-    <div class="h-screen/4 container mx-auto flex md:flex-row flex-col justify-center px-2 py-6 bg-gradient-to-bl from-start to-end text-white rounded-xl shadow-sm">
-      <div class="md:border-r w-full md:w-6/12 p-4 flex flex-row items-center">
+  <div class="flex flex-col items-center h-screen bg-grey-100">
+    <main class="mw-8/12">
+
+      <section class="py-16 xl:pb-24 grid lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <p class="font-serif font-bold text-5xl leading-tight">
+            deslimstemens.online
+          </p>
+        </div>
+      </section>
+      <section
+          class="h-screen/4 container mx-auto flex md:flex-row flex-col bg-grey-100 justify-center px-2 py-6 bg-gradient-to-bl from-start to-end text-white rounded-xl shadow-sm">
+        <div class="md:border-r w-full md:w-6/12 p-4 flex flex-row items-center">
           <button @click="openQuizCreateModal($event, $el)"
-                  class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full">
+                  class="bg-none border-2 border-white text-white hover:text-white text-center hover:bg-white hover:text-end font-bold py-4 mt-2 w-full rounded-full">
             Quiz samenstellen
           </button>
-      </div>
-      <div class="w-full md:w-6/12 p-4 flex flex-row items-center">
-        <button @click="openQuizJoinModal($event, $el)"
-                class="bg-none border-2 border-black text-black hover:bg-black hover:text-white text-center font-bold py-4 mt-2 w-full rounded-full">
-          Deelnemen aan een quiz
-        </button>
-      </div>
-    </div>
+        </div>
+        <div class="w-full md:w-6/12 p-4 flex flex-row items-center">
+          <button @click="openQuizJoinModal($event, $el)"
+                  class="bg-none border-2 border-white text-white hover:bg-white hover:text-end text-center font-bold py-4 mt-2 w-full rounded-full">
+            Deelnemen aan een quiz
+          </button>
+        </div>
+      </section>
+    </main>
+
     <modal ref="quizCreateModal" @close="clearInputs()">
       <template v-slot:header>
         <label for="game-name">
